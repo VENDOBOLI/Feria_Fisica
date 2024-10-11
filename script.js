@@ -34,16 +34,15 @@ document.getElementById('simular').addEventListener('click', function() {
 
 function moverVehiculos(distancia, velocidad) {
     const bicicleta = document.getElementById('bicicleta');
-    const carrito = document.getElementById('carrito');
+    const carro = document.getElementById('carro');
     const velocidadPixelesPorSegundo = (velocidad * 1000 / 3600); // km/h a m/s
 
-    // Calcular la duración en segundos para mover la bicicleta
+    // Calcular la duración en segundos para mover la bicicleta y el carro
     const duracion = (distancia / velocidad) * 1000; // convertir a milisegundos
 
     bicicleta.style.transition = `transform ${duracion}ms linear`;
-    carrito.style.transition = `transform ${duracion}ms linear`;
+    carro.style.transition = `transform ${duracion}ms linear`;
 
     bicicleta.style.transform = `translateX(${distancia * 10}px)`; // Multiplicamos por 10 para mayor visualización
-    carrito.style.transform = `translateX(${distancia * 10}px)`;
+    carro.style.transform = `translateX(-${distancia * 10}px)`;
 }
-
