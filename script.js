@@ -27,4 +27,23 @@ document.getElementById('simular').addEventListener('click', function() {
         <p>Emisiones de CO2 generadas por el automóvil: ${emisionesAuto.toFixed(2)} kg</p>
         <p>Emisiones de CO2 evitadas por usar la bicicleta: ${emisionesAuto.toFixed(2)} kg</p>
     `;
+
+    // Iniciar animación
+    moverVehiculos(distanciaBici, velocidadBici);
 });
+
+function moverVehiculos(distancia, velocidad) {
+    const bicicleta = document.getElementById('bicicleta');
+    const carrito = document.getElementById('carrito');
+    const velocidadPixelesPorSegundo = (velocidad * 1000 / 3600); // km/h a m/s
+
+    // Calcular la duración en segundos para mover la bicicleta
+    const duracion = (distancia / velocidad) * 1000; // convertir a milisegundos
+
+    bicicleta.style.transition = `transform ${duracion}ms linear`;
+    carrito.style.transition = `transform ${duracion}ms linear`;
+
+    bicicleta.style.transform = `translateX(${distancia * 10}px)`; // Multiplicamos por 10 para mayor visualización
+    carrito.style.transform = `translateX(${distancia * 10}px)`;
+}
+
