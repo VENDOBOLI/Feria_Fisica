@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Emisiones</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Simulador de Reducción de Emisiones</h1>
+        
+        <label for="velocidad_bici">Velocidad de la Bicicleta (km/h):</label>
+        <input type="number" id="velocidad_bici" placeholder="Ej. 20">
+
+        <label for="tiempo_bici">Tiempo en Bicicleta (horas):</label>
+        <input type="number" id="tiempo_bici" placeholder="Ej. 1">
+
+        <label for="velocidad_auto">Velocidad del Automóvil (km/h):</label>
+        <input type="number" id="velocidad_auto" placeholder="Ej. 40">
+
+        <label for="tiempo_auto">Tiempo en Automóvil (horas):</label>
+        <input type="number" id="tiempo_auto" placeholder="Ej. 1">
+
+        <button id="simular">Simular</button>
+
+        <div id="resultados"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
