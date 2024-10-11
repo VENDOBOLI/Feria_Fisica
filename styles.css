@@ -40,3 +40,30 @@ button:hover {
 #resultados {
     margin-top: 20px;
 }
+
+.animacion {
+    position: relative;
+    height: 100px;
+    margin-top: 20px;
+    overflow: hidden;
+}
+
+.bicicleta {
+    width: 50px;
+    height: 30px;
+    background: url('https://cdn-icons-png.flaticon.com/512/2079/2079741.png') no-repeat center center;
+    background-size: contain;
+    position: absolute;
+    bottom: 0;
+}
+
+.carrito {
+    width: 30px;
+    height: 20px;
+    background: url('https://cdn-icons-png.flaticon.com/512/861/861218.png') no-repeat center center;
+    background-size: contain;
+    position: absolute;
+    bottom: 0;
+    left: 60px; /* Ajuste para que el carrito esté al lado de la bicicleta */
+}
+
