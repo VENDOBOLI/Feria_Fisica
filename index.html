@@ -10,6 +10,13 @@
     <div class="container">
         <h1>Simulador de Reducción de Emisiones</h1>
         
+        <div class="animacion">
+            <div class="carretera">
+                <img id="bicicleta" class="bicicleta" src="https://cdn-icons-png.flaticon.com/512/2079/2079741.png" alt="Bicicleta con ciclista">
+                <img id="carro" class="carro" src="https://cdn-icons-png.flaticon.com/512/862/862131.png" alt="Carro emitiendo CO2">
+            </div>
+        </div>
+
         <label for="velocidad_bici">Velocidad de la Bicicleta (km/h):</label>
         <input type="number" id="velocidad_bici" placeholder="Ej. 20">
 
@@ -25,15 +32,8 @@
         <button id="simular">Simular</button>
 
         <div id="resultados"></div>
-
-        <!-- Elementos gráficos -->
-        <div class="animacion">
-            <div id="bicicleta" class="bicicleta"></div>
-            <div id="carrito" class="carrito"></div>
-        </div>
     </div>
 
     <script src="script.js"></script>
 </body>
 </html>
-
