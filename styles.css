@@ -34,7 +34,7 @@ h1 {
 .bicicleta {
     width: 50px;
     position: absolute;
-    bottom: 150px; /* Altura ajustada para que la bicicleta esté más arriba */
+    bottom: 100px; /* Altura ajustada para que la bicicleta esté más arriba */
     left: 0;
 }
 
