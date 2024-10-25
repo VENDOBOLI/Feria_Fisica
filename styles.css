@@ -32,16 +32,17 @@ h1 {
 }
 
 .bicicleta {
-    width: 50px; /* Ajusta el tamaño según tu preferencia */
+    width: 50px;
     position: absolute;
-    bottom: 30px; /* Ajusta la altura del vehículo respecto a la carretera */
-    left: 0; /* Ambos vehículos comienzan desde la misma posición inicial */
+    bottom: 50px; /* Altura ajustada para que la bicicleta esté más arriba */
+    left: 0;
 }
+
 .carro {
-    width: 50px; /* Ajusta el tamaño según tu preferencia */
+    width: 60px;
     position: absolute;
-    bottom: 10px; /* Ajusta la altura del vehículo respecto a la carretera */
-    left: 0; /* Ambos vehículos comienzan desde la misma posición inicial */
+    bottom: 10px; /* Mantiene el carro en una posición más baja */
+    left: 0;
 }
 
 
