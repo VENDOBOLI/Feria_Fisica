@@ -47,6 +47,10 @@ function moverVehiculos(distancia, velocidad) {
     const carro = document.getElementById('carro');
     const velocidadPixelesPorSegundo = (velocidad * 1000 / 3600); // km/h a m/s
 
+    // Reiniciar posiciones iniciales
+    bicicleta.style.transform = 'translateX(0)';
+    carro.style.transform = 'translateX(0)';
+
     // Calcular la duración en milisegundos para mover la bicicleta y el carro
     const duracion = (distancia / velocidad) * 1000; // convertir a milisegundos
 
