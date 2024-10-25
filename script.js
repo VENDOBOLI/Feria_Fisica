@@ -45,7 +45,6 @@ document.getElementById('simular').addEventListener('click', function() {
 function moverVehiculos(distancia, velocidad) {
     const bicicleta = document.getElementById('bicicleta');
     const carro = document.getElementById('carro');
-    const velocidadPixelesPorSegundo = (velocidad * 1000 / 3600); // km/h a m/s
 
     // Reiniciar posiciones iniciales
     bicicleta.style.transform = 'translateX(0)';
@@ -61,3 +60,18 @@ function moverVehiculos(distancia, velocidad) {
     bicicleta.style.transform = `translateX(${distancia * 10}px)`; // Multiplicamos por 10 para mayor visualización
     carro.style.transform = `translateX(${distancia * 10}px)`;
 }
+
+// Evento para reiniciar la animación
+document.getElementById('reiniciar').addEventListener('click', function() {
+    const bicicleta = document.getElementById('bicicleta');
+    const carro = document.getElementById('carro');
+
+    // Quitar transición y volver a la posición inicial
+    bicicleta.style.transition = 'none';
+    carro.style.transition = 'none';
+    bicicleta.style.transform = 'translateX(0)';
+    carro.style.transform = 'translateX(0)';
+
+    // Limpiar resultados
+    document.getElementById('resultados').innerHTML = '';
+});
