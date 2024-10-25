@@ -31,7 +31,12 @@ h1 {
     border-radius: 10px;
 }
 
-.bicicleta,
+.bicicleta {
+    width: 50px; /* Ajusta el tamaño según tu preferencia */
+    position: absolute;
+    bottom: 30px; /* Ajusta la altura del vehículo respecto a la carretera */
+    left: 0; /* Ambos vehículos comienzan desde la misma posición inicial */
+}
 .carro {
     width: 50px; /* Ajusta el tamaño según tu preferencia */
     position: absolute;
