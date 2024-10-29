@@ -36,16 +36,16 @@ h1 {
 }
 
 .bicicleta {
-    width: 100px;
+    width: 75px;
     position: absolute;
-    bottom: 80px;
+    bottom: 90px;
     left: 0;
 }
 
 .carro {
-    width: 150px;
+    width: 200px;
     position: absolute;
-    bottom: 10px;
+    bottom: 5px;
     left: 0;
 }
 
