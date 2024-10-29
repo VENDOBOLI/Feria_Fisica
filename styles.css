@@ -20,31 +20,43 @@ h1 {
 
 .animacion {
     position: relative;
-    height: 200px; /* Altura ajustable según las imágenes */
+    height: 200px;
     margin: 20px 0;
+    overflow: hidden;
 }
 
 .carretera {
     position: relative;
     height: 100%;
-    background: #ccc; /* Color de la carretera */
+    background-image: url('https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.freepik.es%2Fvector-premium%2Fvista-superior-carretera-camino-calle-asfalto-dibujos-animados_32185229.htm&psig=AOvVaw2RbkPM9X3jjUxzbXcZIqT5&ust=1730322561436000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCKCdmP-_tIkDFQAAAAAdAAAAABAE'); /* Imagen de la carretera */
+    background-size: cover;
+    background-repeat: repeat-x; /* Repite horizontalmente */
     border-radius: 10px;
+    animation: moverCarretera 5s linear infinite; /* Animación de movimiento de la carretera */
 }
 
 .bicicleta {
     width: 50px;
     position: absolute;
-    bottom: 100px; /* Altura ajustada para que la bicicleta esté más arriba */
+    bottom: 100px;
     left: 0;
 }
 
 .carro {
     width: 60px;
     position: absolute;
-    bottom: 10px; /* Mantiene el carro en una posición más baja */
+    bottom: 10px;
     left: 0;
 }
 
+@keyframes moverCarretera {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: -1000px 0;
+    }
+}
 
 label {
     margin: 10px 0 5px;
@@ -73,4 +85,3 @@ button:hover {
 #resultados {
     margin-top: 20px;
 }
-
