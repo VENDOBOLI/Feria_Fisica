@@ -39,12 +39,12 @@ h1 {
 .bicicleta {
     width: 75px;
     position: absolute;
-    bottom: 90px;
+    bottom: 95px;
     left: 0;
 }
 
 .carro {
-    width: 200px;
+    width: 175px;
     position: absolute;
     bottom: 5px;
     left: 0;
