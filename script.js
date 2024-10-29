@@ -45,10 +45,17 @@ document.getElementById('simular').addEventListener('click', function() {
 function moverVehiculos(distancia, velocidad) {
     const bicicleta = document.getElementById('bicicleta');
     const carro = document.getElementById('carro');
-
+    
     // Reiniciar posiciones iniciales
     bicicleta.style.transform = 'translateX(0)';
     carro.style.transform = 'translateX(0)';
+    
+    // Obtener el ancho de la carretera
+    const carretera = document.querySelector('.carretera');
+    const anchoCarretera = carretera.clientWidth; // Ancho real del contenedor
+
+    // Asegurarse de que la distancia no exceda el ancho de la carretera
+    const distanciaMaxima = Math.min(distancia * 10, anchoCarretera); // Multiplicamos por 10 para la visualización
 
     // Calcular la duración en milisegundos para mover la bicicleta y el carro
     const duracion = (distancia / velocidad) * 1000; // convertir a milisegundos
@@ -57,9 +64,10 @@ function moverVehiculos(distancia, velocidad) {
     carro.style.transition = `transform ${duracion}ms linear`;
 
     // Mover ambos vehículos en la misma dirección
-    bicicleta.style.transform = `translateX(${distancia * 10}px)`; // Multiplicamos por 10 para mayor visualización
-    carro.style.transform = `translateX(${distancia * 10}px)`;
+    bicicleta.style.transform = `translateX(${distanciaMaxima}px)`; 
+    carro.style.transform = `translateX(${distanciaMaxima}px)`;
 }
+
 
 // Evento para reiniciar la animación
 document.getElementById('reiniciar').addEventListener('click', function() {
