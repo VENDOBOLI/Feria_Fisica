@@ -28,7 +28,7 @@ h1 {
 .carretera {
     position: relative;
     height: 100%;
-    background-image: url('https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.freepik.es%2Fvector-premium%2Fvista-superior-carretera-camino-calle-asfalto-dibujos-animados_32185229.htm&psig=AOvVaw2RbkPM9X3jjUxzbXcZIqT5&ust=1730322561436000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCKCdmP-_tIkDFQAAAAAdAAAAABAE'); /* Imagen de la carretera */
+    background-image: url('https://img.freepik.com/vector-premium/vista-superior-carretera-camino-calle-asfalto-dibujos-animados_543062-3276.jpg?w=740'); /* Imagen de la carretera */
     background-size: cover;
     background-repeat: repeat-x; /* Repite horizontalmente */
     border-radius: 10px;
