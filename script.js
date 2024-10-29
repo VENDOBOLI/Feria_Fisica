@@ -33,16 +33,17 @@ document.getElementById('simular').addEventListener('click', function() {
     document.getElementById('resultados').innerHTML = `
         <h2>Resultados</h2>
         <p>Distancia recorrida en bicicleta: ${distanciaBici.toFixed(2)} km</p>
+        <p>Distancia recorrida en automóvil: ${distanciaAuto.toFixed(2)} km</p> <!-- Añadido -->
         <p>Consumo de combustible del automóvil: ${consumoAuto.toFixed(2)} L</p>
         <p>Emisiones de CO2 generadas por el automóvil: ${emisionesAuto.toFixed(2)} kg</p>
         <p>Emisiones de CO2 evitadas por usar la bicicleta: ${emisionesAuto.toFixed(2)} kg</p>
     `;
 
     // Iniciar animación sincronizada
-    moverVehiculos(distanciaBici, velocidadBici);
+    moverVehiculos(distanciaBici, distanciaAuto, velocidadBici, velocidadAuto);
 });
 
-function moverVehiculos(distancia, velocidad) {
+function moverVehiculos(distanciaBici, distanciaAuto, velocidadBici, velocidadAuto) {
     const bicicleta = document.getElementById('bicicleta');
     const carro = document.getElementById('carro');
     
@@ -55,19 +56,20 @@ function moverVehiculos(distancia, velocidad) {
     const anchoCarretera = carretera.clientWidth; // Ancho real del contenedor
 
     // Asegurarse de que la distancia no exceda el ancho de la carretera
-    const distanciaMaxima = Math.min(distancia * 10, anchoCarretera); // Multiplicamos por 10 para la visualización
+    const distanciaMaximaBici = Math.min(distanciaBici * 10, anchoCarretera); // Multiplicamos por 10 para la visualización
+    const distanciaMaximaAuto = Math.min(distanciaAuto * 10, anchoCarretera); // Multiplicamos por 10 para la visualización
 
     // Calcular la duración en milisegundos para mover la bicicleta y el carro
-    const duracion = (distancia / velocidad) * 1000; // convertir a milisegundos
+    const duracionBici = (distanciaBici / velocidadBici) * 1000; // convertir a milisegundos
+    const duracionAuto = (distanciaAuto / velocidadAuto) * 1000; // convertir a milisegundos
 
-    bicicleta.style.transition = `transform ${duracion}ms linear`;
-    carro.style.transition = `transform ${duracion}ms linear`;
+    bicicleta.style.transition = `transform ${duracionBici}ms linear`;
+    carro.style.transition = `transform ${duracionAuto}ms linear`;
 
     // Mover ambos vehículos en la misma dirección
-    bicicleta.style.transform = `translateX(${distanciaMaxima}px)`; 
-    carro.style.transform = `translateX(${distanciaMaxima}px)`;
+    bicicleta.style.transform = `translateX(${distanciaMaximaBici}px)`; 
+    carro.style.transform = `translateX(${distanciaMaximaAuto}px)`;
 }
-
 
 // Evento para reiniciar la animación
 document.getElementById('reiniciar').addEventListener('click', function() {
