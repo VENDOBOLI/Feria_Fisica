@@ -43,9 +43,9 @@ h1 {
 }
 
 .carro {
-    width: 300px;
+    width: 150px;
     position: absolute;
-    bottom: 20px;
+    bottom: 10px;
     left: 0;
 }
 
