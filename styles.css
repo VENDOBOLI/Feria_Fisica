@@ -28,6 +28,7 @@ h1 {
 .carretera {
     position: relative;
     height: 100%;
+    width: 100%;
     background-image: url('https://img.freepik.com/vector-premium/vista-superior-carretera-camino-calle-asfalto-dibujos-animados_543062-3276.jpg?w=740'); /* Imagen de la carretera */
     background-size: cover;
     background-repeat: repeat-x; /* Repite horizontalmente */
