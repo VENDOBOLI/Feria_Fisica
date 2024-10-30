@@ -13,7 +13,7 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
     background-image: url('images/logo.png'); /* Ruta de la imagen del logo */
-    background-size: 150px; /* Ajusta el tamaño del logo para que sea pequeño como marca de agua */
+    background-size: 160px; /* Ajusta el tamaño del logo para que sea pequeño como marca de agua */
     background-repeat: repeat; /* Hace que el logo se repita en todo el contenedor */
     background-position: center;
     opacity: 1; /* Mantiene el contenido al 100% de opacidad */
