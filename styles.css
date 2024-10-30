@@ -9,7 +9,7 @@ body {
     margin: 0 auto;
     padding: 20px;
     background: 
-        url('/mnt/data/Decoracion.png') no-repeat, /* Primer fondo: imagen decorativa */
+        url('images/Decoracion.png') no-repeat, /* Primer fondo: imagen decorativa */
         url('images/logo.png') repeat; /* Segundo fondo: patrón de ajedrez */
     background-size: cover, 80px 80px; /* Ajusta el tamaño de la imagen decorativa y del patrón */
     background-position: left center, right center; /* Posiciona la imagen a la izquierda y el patrón a la derecha */
