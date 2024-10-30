@@ -8,16 +8,16 @@ body {
     max-width: 600px;
     margin: 0 auto;
     padding: 20px;
-    background: rgba(255, 255, 255, 0.9); /* Fondo blanco semitransparente */
+    background: 
+        url('images/logo.png') repeat, /* Primer fondo: patrón de ajedrez */
+        url('/mnt/data/Decoracion.png') no-repeat; /* Segundo fondo: imagen subida */
+    background-size: 80px 80px, cover; /* Tamaño del patrón y de la imagen */
+    background-position: left center, right center; /* Posiciona el patrón a la izquierda y la imagen a la derecha */
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
-    background-image: url('images/logo.png'); /* Ruta de la imagen del logo */
-    background-size: 160px; /* Ajusta el tamaño del logo para que sea pequeño como marca de agua */
-    background-repeat: repeat; /* Hace que el logo se repita en todo el contenedor */
-    background-position: center;
-    opacity: 1; /* Mantiene el contenido al 100% de opacidad */
 }
+
 
 
 h1 {
