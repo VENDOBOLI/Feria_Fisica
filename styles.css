@@ -8,11 +8,17 @@ body {
     max-width: 600px;
     margin: 0 auto;
     padding: 20px;
-    background: #fff;
+    background: rgba(255, 255, 255, 0.9); /* Fondo blanco semitransparente */
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
+    background-image: url('images/logo.png'); /* Ruta de la imagen del logo */
+    background-size: 150px; /* Ajusta el tamaño del logo para que sea pequeño como marca de agua */
+    background-repeat: repeat; /* Hace que el logo se repita en todo el contenedor */
+    background-position: center;
+    opacity: 1; /* Mantiene el contenido al 100% de opacidad */
 }
+
 
 h1 {
     margin-bottom: 20px;
