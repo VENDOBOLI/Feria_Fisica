@@ -1,12 +1,12 @@
 document.getElementById('simular').addEventListener('click', function() {
     // Obtener valores de entrada
-    const tipoVehiculo = document.getElementById('tipo_vehiculo').value;
     const velocidadInicial = parseFloat(document.getElementById('velocidad_inicial').value);
     const tiempo = parseFloat(document.getElementById('tiempo').value);
+    const tipoVehiculo = document.getElementById('tipo_vehiculo').value;
     const tipoMovimiento = document.getElementById('tipo_movimiento').value;
 
     // Validar entradas
-    if (isNaN(velocidadInicial) || isNaN(tiempo) || velocidadInicial <= 0 || tiempo <= 0) {
+    if (isNaN(velocidadInicial) || velocidadInicial <= 0 || isNaN(tiempo) || tiempo <= 0) {
         document.getElementById('resultados').innerHTML = `
             <h2>Error</h2>
             <p>Por favor ingrese valores válidos para todas las entradas.</p>
@@ -14,162 +14,99 @@ document.getElementById('simular').addEventListener('click', function() {
         return;
     }
 
-    // Factores importantes
+    // Factores de emisión y consumo para cada tipo de vehículo
     const EMISIONES_CO2_POR_LITRO = 2.3; // kg CO2 por litro de gasolina
-    const CONSUMO_PROMEDIO = tipoVehiculo === 'automovil' ? 0.09 : tipoVehiculo === 'camioneta' ? 0.12 : 0.18; // consumo diferente por vehículo
+    const CONSUMO_PROMEDIO = {
+        "automovil": 0.09,    // litros por km
+        "camioneta": 0.12,    // litros por km
+        "camion": 0.3         // litros por km
+    };
+    const consumoPromedio = CONSUMO_PROMEDIO[tipoVehiculo];
 
-    // Calcular distancia y consumo
-    const distancia = velocidadInicial * tiempo;
-    const consumo = CONSUMO_PROMEDIO * distancia;
-    const emisiones = consumo * EMISIONES_CO2_POR_LITRO;
+    let distancia, emisiones;
+
+    if (tipoMovimiento === "MRU") {
+        // Movimiento Rectilíneo Uniforme (MRU)
+        distancia = velocidadInicial * tiempo;
+    } else {
+        // Movimiento Rectilíneo Uniformemente Acelerado (MRUA)
+        const numIntervalos = parseInt(prompt("¿Cuántos intervalos de velocidad desea?"));
+        if (isNaN(numIntervalos) || numIntervalos <= 0) {
+            alert("Número de intervalos inválido.");
+            return;
+        }
+
+        distancia = 0;
+        let velocidad = velocidadInicial;
+        const intervalos = [];
+
+        for (let i = 1; i <= numIntervalos; i++) {
+            const nuevoTiempo = tiempo / numIntervalos;
+            velocidad = parseFloat(prompt(`Ingrese la velocidad para el intervalo ${i}:`));
+
+            if (isNaN(velocidad) || velocidad < 0) {
+                alert("Velocidad inválida.");
+                return;
+            }
+
+            distancia += velocidad * nuevoTiempo;
+            intervalos.push({ tiempo: nuevoTiempo * i, velocidad });
+        }
+
+        // Generar tabla de velocidad vs tiempo
+        generarTabla(intervalos);
+    }
+
+    // Calcular consumo y emisiones de CO2
+    const consumo = consumoPromedio * distancia;
+    emisiones = consumo * EMISIONES_CO2_POR_LITRO;
 
     // Mostrar resultados
     document.getElementById('resultados').innerHTML = `
         <h2>Resultados</h2>
         <p>Distancia recorrida: ${distancia.toFixed(2)} km</p>
         <p>Consumo de combustible: ${consumo.toFixed(2)} L</p>
-        <p>Emisiones de CO2 generadas: ${emisiones.toFixed(2)} kg</p>
+        <p>Emisiones de CO2: ${emisiones.toFixed(2)} kg</p>
     `;
 
-    // Guardar datos para el gráfico de emisiones
-    addEmissionData(tipoVehiculo, emisiones);
-
-    // Generar gráfico de velocidad vs tiempo para MRUA
-    if (tipoMovimiento === 'MRUA') {
-        let intervalos = parseInt(prompt("¿Cuántos intervalos de velocidad desea?"));
-        if (isNaN(intervalos) || intervalos <= 0) {
-            alert("Por favor ingrese un número válido de intervalos.");
-            return;
-        }
-        const speeds = generateSpeedsForMRUA(velocidadInicial, intervalos);
-        createSpeedTimeChart(speeds, tiempo);
-    } else {
-        // Gráfico de velocidad constante (MRU)
-        createSpeedTimeChart([velocidadInicial], tiempo);
-    }
+    // Almacenar datos para el diagrama de barras
+    almacenarDatosEmisiones(tipoVehiculo, emisiones);
+    actualizarDiagramaEmisiones();
 });
 
-function addEmissionData(tipoVehiculo, emisiones) {
-    if (!window.emissionChart) {
-        const ctx = document.getElementById('diagramaEmisiones').getContext('2d');
-        window.emissionChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Emisiones de CO2 (kg)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    data: []
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    }
-    window.emissionChart.data.labels.push(tipoVehiculo);
-    window.emissionChart.data.datasets[0].data.push(emisiones);
-    window.emissionChart.update();
+function generarTabla(intervalos) {
+    let tablaHTML = `<table><tr><th>Tiempo (s)</th><th>Velocidad (km/h)</th></tr>`;
+    intervalos.forEach(intervalo => {
+        tablaHTML += `<tr><td>${intervalo.tiempo.toFixed(2)}</td><td>${intervalo.velocidad.toFixed(2)}</td></tr>`;
+    });
+    tablaHTML += `</table>`;
+    document.getElementById('tabla_velocidad').innerHTML = tablaHTML;
 }
 
-function generateSpeedsForMRUA(velocidadInicial, intervalos) {
-    const speeds = [];
-    let speed = velocidadInicial;
-    for (let i = 0; i < intervalos; i++) {
-        speed += (Math.random() * 20 - 10); // Variación aleatoria de velocidad para MRUA
-        speeds.push(speed);
-    }
-    return speeds;
+const datosEmisiones = { "automovil": 0, "camioneta": 0, "camion": 0 };
+
+function almacenarDatosEmisiones(tipoVehiculo, emisiones) {
+    datosEmisiones[tipoVehiculo] += emisiones;
 }
 
-function createSpeedTimeChart(speeds, tiempo) {
-    const timeLabels = Array.from({ length: speeds.length }, (_, i) => (i * (tiempo / speeds.length)).toFixed(2));
-    const ctx = document.getElementById('tabla_velocidad').getContext('2d');
-    
-    if (window.speedTimeChart) {
-        window.speedTimeChart.destroy();
-    }
-
-    window.speedTimeChart = new Chart(ctx, {
-        type: 'line',
+function actualizarDiagramaEmisiones() {
+    // Ejemplo de código para actualizar un diagrama de barras (se puede hacer con Chart.js o cualquier otra librería de gráficos)
+    const ctx = document.getElementById('diagramaEmisiones').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
         data: {
-            labels: timeLabels,
+            labels: ['Automóvil', 'Camioneta', 'Camión'],
             datasets: [{
-                label: 'Velocidad (km/h)',
-                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                borderColor: 'rgba(255, 99, 132, 1)',
-                data: speeds,
-                fill: false,
+                label: 'Emisiones de CO2 (kg)',
+                data: [datosEmisiones.automovil, datosEmisiones.camioneta, datosEmisiones.camion],
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
             }]
         },
         options: {
+            responsive: true,
             scales: {
-                y: {
-                    beginAtZero: true
-                }
+                y: { beginAtZero: true }
             }
         }
     });
 }
-
-// Evento para reiniciar la simulación y las gráficas
-document.getElementById('reiniciar').addEventListener('click', function() {
-    const ctxEmision = document.getElementById('diagramaEmisiones').getContext('2d');
-    const ctxVelocidad = document.getElementById('tabla_velocidad').getContext('2d');
-
-    // Reiniciar gráficos si existen
-    if (window.emissionChart) {
-        window.emissionChart.destroy();
-        window.emissionChart = new Chart(ctxEmision, {
-            type: 'bar',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Emisiones de CO2 (kg)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    data: []
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    }
-
-    if (window.speedTimeChart) {
-        window.speedTimeChart.destroy();
-        window.speedTimeChart = new Chart(ctxVelocidad, {
-            type: 'line',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Velocidad (km/h)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    data: [],
-                    fill: false,
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    }
-
-    // Limpiar resultados
-    document.getElementById('resultados').innerHTML = '';
-});
