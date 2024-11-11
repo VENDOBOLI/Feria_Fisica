@@ -36,11 +36,13 @@ document.getElementById('simular').addEventListener('click', function() {
 
     // Generar gráfico de velocidad vs tiempo para MRUA
     if (tipoMovimiento === 'MRUA') {
-        const intervalos = prompt("¿Cuántos intervalos de velocidad desea?");
-        if (intervalos) {
-            const speeds = generateSpeedsForMRUA(velocidadInicial, parseInt(intervalos));
-            createSpeedTimeChart(speeds, tiempo);
+        let intervalos = parseInt(prompt("¿Cuántos intervalos de velocidad desea?"));
+        if (isNaN(intervalos) || intervalos <= 0) {
+            alert("Por favor ingrese un número válido de intervalos.");
+            return;
         }
+        const speeds = generateSpeedsForMRUA(velocidadInicial, intervalos);
+        createSpeedTimeChart(speeds, tiempo);
     } else {
         // Gráfico de velocidad constante (MRU)
         createSpeedTimeChart([velocidadInicial], tiempo);
@@ -79,7 +81,7 @@ function generateSpeedsForMRUA(velocidadInicial, intervalos) {
     const speeds = [];
     let speed = velocidadInicial;
     for (let i = 0; i < intervalos; i++) {
-        speed += (Math.random() * 20 - 10); // Random variation for MRUA effect
+        speed += (Math.random() * 20 - 10); // Variación aleatoria de velocidad para MRUA
         speeds.push(speed);
     }
     return speeds;
