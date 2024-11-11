@@ -8,18 +8,15 @@ body {
     max-width: 600px;
     margin: 0 auto;
     padding: 20px;
-    background: 
-        url('images/Decoracion.png') no-repeat, /* Primer fondo: imagen decorativa */
-        url('images/logo.png') repeat; /* Segundo fondo: patrón de ajedrez */
-    background-size: cover, 80px 80px; /* Ajusta el tamaño de la imagen decorativa y del patrón */
-    background-position: left center, right center; /* Posiciona la imagen a la izquierda y el patrón a la derecha */
+    background:
+        url('images/Decoracion.png') no-repeat,
+        url('images/logo.png') repeat;
+    background-size: cover, 80px 80px;
+    background-position: left center, right center;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
-
-
-
 
 h1 {
     margin-bottom: 20px;
@@ -36,18 +33,11 @@ h1 {
     position: relative;
     height: 100%;
     width: 100%;
-    background-image: url('https://img.freepik.com/vector-premium/vista-superior-carretera-camino-calle-asfalto-dibujos-animados_543062-3276.jpg?w=740'); /* Imagen de la carretera */
+    background-image: url('https://img.freepik.com/vector-premium/vista-superior-carretera-camino-calle-asfalto-dibujos-animados_543062-3276.jpg?w=740');
     background-size: cover;
-    background-repeat: repeat-x; /* Repite horizontalmente */
+    background-repeat: repeat-x;
     border-radius: 10px;
-    animation: moverCarretera 5s linear infinite; /* Animación de movimiento de la carretera */
-}
-
-.bicicleta {
-    width: 75px;
-    position: absolute;
-    bottom: 95px;
-    left: 0;
+    animation: moverCarretera 5s linear infinite;
 }
 
 .carro {
@@ -71,7 +61,7 @@ label {
     display: block;
 }
 
-input {
+input, select {
     width: 100%;
     padding: 8px;
     margin-bottom: 15px;
@@ -93,3 +83,12 @@ button:hover {
 #resultados {
     margin-top: 20px;
 }
+
+#tabla_velocidad {
+    margin-top: 20px;
+}
+
+canvas {
+    margin-top: 20px;
+}
+
