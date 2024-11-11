@@ -116,3 +116,60 @@ function createSpeedTimeChart(speeds, tiempo) {
         }
     });
 }
+
+// Evento para reiniciar la simulación y las gráficas
+document.getElementById('reiniciar').addEventListener('click', function() {
+    const ctxEmision = document.getElementById('diagramaEmisiones').getContext('2d');
+    const ctxVelocidad = document.getElementById('tabla_velocidad').getContext('2d');
+
+    // Reiniciar gráficos si existen
+    if (window.emissionChart) {
+        window.emissionChart.destroy();
+        window.emissionChart = new Chart(ctxEmision, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Emisiones de CO2 (kg)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    data: []
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    if (window.speedTimeChart) {
+        window.speedTimeChart.destroy();
+        window.speedTimeChart = new Chart(ctxVelocidad, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Velocidad (km/h)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    data: [],
+                    fill: false,
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    // Limpiar resultados
+    document.getElementById('resultados').innerHTML = '';
+});
