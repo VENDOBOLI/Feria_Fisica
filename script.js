@@ -1,112 +1,145 @@
-document.getElementById('simular').addEventListener('click', function() {
-    // Obtener valores de entrada
-    const velocidadInicial = parseFloat(document.getElementById('velocidad_inicial').value);
-    const tiempo = parseFloat(document.getElementById('tiempo').value);
-    const tipoVehiculo = document.getElementById('tipo_vehiculo').value;
-    const tipoMovimiento = document.getElementById('tipo_movimiento').value;
-
-    // Validar entradas
-    if (isNaN(velocidadInicial) || velocidadInicial <= 0 || isNaN(tiempo) || tiempo <= 0) {
-        document.getElementById('resultados').innerHTML = `
-            <h2>Error</h2>
-            <p>Por favor ingrese valores válidos para todas las entradas.</p>
-        `;
-        return;
-    }
-
-    // Factores de emisión y consumo para cada tipo de vehículo
-    const EMISIONES_CO2_POR_LITRO = 2.3; // kg CO2 por litro de gasolina
-    const CONSUMO_PROMEDIO = {
-        "automovil": 0.09,    // litros por km
-        "camioneta": 0.12,    // litros por km
-        "camion": 0.3         // litros por km
-    };
-    const consumoPromedio = CONSUMO_PROMEDIO[tipoVehiculo];
-
-    let distancia, emisiones;
-
-    if (tipoMovimiento === "MRU") {
-        // Movimiento Rectilíneo Uniforme (MRU)
-        distancia = velocidadInicial * tiempo;
+document.getElementById('tipo_movimiento').addEventListener('change', function() {
+    const movimiento = document.getElementById('tipo_movimiento').value;
+    const mruaContainer = document.getElementById('mrua_intervals');
+    if (movimiento === 'mrua') {
+        mruaContainer.style.display = 'block';
     } else {
-        // Movimiento Rectilíneo Uniformemente Acelerado (MRUA)
-        const numIntervalos = parseInt(prompt("¿Cuántos intervalos de velocidad desea?"));
-        if (isNaN(numIntervalos) || numIntervalos <= 0) {
-            alert("Número de intervalos inválido.");
+        mruaContainer.style.display = 'none';
+        document.getElementById('intervals_container').innerHTML = '';
+    }
+});
+
+document.getElementById('num_intervals').addEventListener('input', function() {
+    const intervalsContainer = document.getElementById('intervals_container');
+    intervalsContainer.innerHTML = '';
+    const numIntervals = parseInt(this.value);
+
+    for (let i = 1; i <= numIntervals; i++) {
+        const intervalDiv = document.createElement('div');
+        intervalDiv.innerHTML = `
+            <h4>Intervalo ${i}</h4>
+            <label>Velocidad (km/h):</label>
+            <input type="number" class="velocidad_intervalo" placeholder="Velocidad para intervalo ${i}">
+            <label>Tiempo (horas):</label>
+            <input type="number" class="tiempo_intervalo" placeholder="Tiempo para intervalo ${i}">
+        `;
+        intervalsContainer.appendChild(intervalDiv);
+    }
+});
+
+document.getElementById('simular').addEventListener('click', function() {
+    const tipoMovimiento = document.getElementById('tipo_movimiento').value;
+    const resultados = document.getElementById('resultados');
+    resultados.innerHTML = '';
+
+    let velocidades = [];
+    let tiempos = [];
+
+    if (tipoMovimiento === 'mru') {
+        const velocidad = parseFloat(document.getElementById('velocidad_auto').value);
+        const tiempo = parseFloat(document.getElementById('tiempo_auto').value);
+
+        if (isNaN(velocidad) || isNaN(tiempo) || velocidad <= 0 || tiempo <= 0) {
+            alert('Ingrese valores válidos para velocidad y tiempo.');
             return;
         }
 
-        distancia = 0;
-        let velocidad = velocidadInicial;
-        const intervalos = [];
+        velocidades.push(velocidad);
+        tiempos.push(tiempo);
+    } else if (tipoMovimiento === 'mrua') {
+        const numIntervals = parseInt(document.getElementById('num_intervals').value);
+        const velocidadInputs = document.getElementsByClassName('velocidad_intervalo');
+        const tiempoInputs = document.getElementsByClassName('tiempo_intervalo');
 
-        for (let i = 1; i <= numIntervalos; i++) {
-            const nuevoTiempo = tiempo / numIntervalos;
-            velocidad = parseFloat(prompt(`Ingrese la velocidad para el intervalo ${i}:`));
+        for (let i = 0; i < numIntervals; i++) {
+            const velocidad = parseFloat(velocidadInputs[i].value);
+            const tiempo = parseFloat(tiempoInputs[i].value);
 
-            if (isNaN(velocidad) || velocidad < 0) {
-                alert("Velocidad inválida.");
+            if (isNaN(velocidad) || isNaN(tiempo) || velocidad <= 0 || tiempo <= 0) {
+                alert(`Ingrese valores válidos para el intervalo ${i + 1}.`);
                 return;
             }
 
-            distancia += velocidad * nuevoTiempo;
-            intervalos.push({ tiempo: nuevoTiempo * i, velocidad });
+            velocidades.push(velocidad);
+            tiempos.push(tiempo);
         }
-
-        // Generar tabla de velocidad vs tiempo
-        generarTabla(intervalos);
     }
 
-    // Calcular consumo y emisiones de CO2
-    const consumo = consumoPromedio * distancia;
-    emisiones = consumo * EMISIONES_CO2_POR_LITRO;
+    const CO2_POR_LITRO = 2.3;
+    const CONSUMO_PROMEDIO = 0.09;
+    let emisionesTotal = 0;
+    let tiempoAcumulado = 0;
+    let velocidadVsTiempo = [];
+    for (let i = 0; i < velocidades.length; i++) {
+        const distancia = velocidades[i] * tiempos[i];
+        const consumo = distancia * CONSUMO_PROMEDIO;
+        const emisiones = consumo * CO2_POR_LITRO;
+        emisionesTotal += emisiones;
+        tiempoAcumulado += tiempos[i];
+        velocidadVsTiempo.push({ tiempo: tiempoAcumulado, velocidad: velocidades[i] });
+    }
 
-    // Mostrar resultados
-    document.getElementById('resultados').innerHTML = `
+    resultados.innerHTML = `
         <h2>Resultados</h2>
-        <p>Distancia recorrida: ${distancia.toFixed(2)} km</p>
-        <p>Consumo de combustible: ${consumo.toFixed(2)} L</p>
-        <p>Emisiones de CO2: ${emisiones.toFixed(2)} kg</p>
+        <p>Total de emisiones de CO2: ${emisionesTotal.toFixed(2)} kg</p>
     `;
 
-    // Almacenar datos para el diagrama de barras
-    almacenarDatosEmisiones(tipoVehiculo, emisiones);
-    actualizarDiagramaEmisiones();
+    mostrarGraficoVelocidadTiempo(velocidadVsTiempo);
+    mostrarGraficoEmisiones(emisionesTotal);
 });
 
-function generarTabla(intervalos) {
-    let tablaHTML = `<table><tr><th>Tiempo (s)</th><th>Velocidad (km/h)</th></tr>`;
-    intervalos.forEach(intervalo => {
-        tablaHTML += `<tr><td>${intervalo.tiempo.toFixed(2)}</td><td>${intervalo.velocidad.toFixed(2)}</td></tr>`;
-    });
-    tablaHTML += `</table>`;
-    document.getElementById('tabla_velocidad').innerHTML = tablaHTML;
-}
+function mostrarGraficoVelocidadTiempo(datos) {
+    const ctx = document.getElementById('graficoVelocidadTiempo').getContext('2d');
+    const tiempos = datos.map(d => d.tiempo);
+    const velocidades = datos.map(d => d.velocidad);
 
-const datosEmisiones = { "automovil": 0, "camioneta": 0, "camion": 0 };
-
-function almacenarDatosEmisiones(tipoVehiculo, emisiones) {
-    datosEmisiones[tipoVehiculo] += emisiones;
-}
-
-function actualizarDiagramaEmisiones() {
-    // Ejemplo de código para actualizar un diagrama de barras (se puede hacer con Chart.js o cualquier otra librería de gráficos)
-    const ctx = document.getElementById('diagramaEmisiones').getContext('2d');
     new Chart(ctx, {
-        type: 'bar',
+        type: 'line',
         data: {
-            labels: ['Automóvil', 'Camioneta', 'Camión'],
+            labels: tiempos,
             datasets: [{
-                label: 'Emisiones de CO2 (kg)',
-                data: [datosEmisiones.automovil, datosEmisiones.camioneta, datosEmisiones.camion],
-                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+                label: 'Velocidad vs Tiempo',
+                data: velocidades,
+                borderColor: 'blue',
+                fill: false
             }]
         },
         options: {
-            responsive: true,
             scales: {
-                y: { beginAtZero: true }
+                x: { title: { display: true, text: 'Tiempo (h)' } },
+                y: { title: { display: true, text: 'Velocidad (km/h)' } }
             }
         }
     });
 }
+
+function mostrarGraficoEmisiones(emisiones) {
+    const ctx = document.getElementById('graficoEmisiones').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Vehículo'],
+            datasets: [{
+                label: 'Emisiones de CO2 (kg)',
+                data: [emisiones],
+                backgroundColor: 'red'
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Emisiones (kg)' } }
+            }
+        }
+    });
+}
+
+document.getElementById('reiniciar').addEventListener('click', function() {
+    document.getElementById('resultados').innerHTML = '';
+    document.getElementById('graficoVelocidadTiempo').getContext('2d').clearRect(0, 0, 400, 400);
+    document.getElementById('graficoEmisiones').getContext('2d').clearRect(0, 0, 400, 400);
+    document.getElementById('velocidad_auto').value = '';
+    document.getElementById('tiempo_auto').value = '';
+    document.getElementById('num_intervals').value = '';
+    document.getElementById('intervals_container').innerHTML = '';
+});
