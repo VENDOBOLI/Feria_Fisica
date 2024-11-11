@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulador de Emisiones</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
@@ -16,31 +17,31 @@
             </div>
         </div>
 
-        <label for="tipo_vehiculo"><strong>Tipo de Vehículo:</strong></label>
-        <select id="tipo_vehiculo">
-            <option value="automovil">Automóvil</option>
-            <option value="camioneta">Camioneta</option>
-            <option value="camion">Camión</option>
-        </select>
+        <label for="velocidad_auto"><strong>Velocidad del Vehículo (km/h):</strong></label>
+        <input type="number" id="velocidad_auto" placeholder="Ej. 40">
 
-        <label for="velocidad_inicial"><strong>Velocidad Inicial (km/h):</strong></label>
-        <input type="number" id="velocidad_inicial" placeholder="Ej. 40">
-
-        <label for="tiempo"><strong>Tiempo (horas):</strong></label>
-        <input type="number" id="tiempo" placeholder="Ej. 1">
+        <label for="tiempo_auto"><strong>Tiempo del Vehículo (horas):</strong></label>
+        <input type="number" id="tiempo_auto" placeholder="Ej. 1">
 
         <label for="tipo_movimiento"><strong>Tipo de Movimiento:</strong></label>
         <select id="tipo_movimiento">
-            <option value="MRU">Movimiento Rectilíneo Uniforme (MRU)</option>
-            <option value="MRUA">Movimiento Rectilíneo Uniformemente Acelerado (MRUA)</option>
+            <option value="mru">MRU</option>
+            <option value="mrua">MRUA</option>
         </select>
+
+        <div id="mrua_intervals" style="display: none;">
+            <label for="num_intervals"><strong>Número de Intervalos:</strong></label>
+            <input type="number" id="num_intervals" min="1" placeholder="Ej. 3">
+
+            <div id="intervals_container"></div>
+        </div>
 
         <button id="simular">Simular</button>
         <button id="reiniciar">Reiniciar</button>
 
         <div id="resultados"></div>
-        <canvas id="diagramaEmisiones" width="400" height="200"></canvas>
-        <div id="tabla_velocidad"></div>
+        <canvas id="graficoVelocidadTiempo"></canvas>
+        <canvas id="graficoEmisiones"></canvas>
     </div>
 
     <script src="script.js"></script>
