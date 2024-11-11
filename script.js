@@ -1,13 +1,12 @@
 document.getElementById('simular').addEventListener('click', function() {
     // Obtener valores de entrada
-    const velocidadBici = parseFloat(document.getElementById('velocidad_bici').value);
-    const tiempoBici = parseFloat(document.getElementById('tiempo_bici').value);
-    const velocidadAuto = parseFloat(document.getElementById('velocidad_auto').value);
-    const tiempoAuto = parseFloat(document.getElementById('tiempo_auto').value);
+    const velocidadInicial = parseFloat(document.getElementById('velocidad_inicial').value);
+    const tiempo = parseFloat(document.getElementById('tiempo').value);
+    const tipoVehiculo = document.getElementById('tipo_vehiculo').value;
+    const tipoMovimiento = document.getElementById('tipo_movimiento').value;
 
     // Validar entradas
-    if (isNaN(velocidadBici) || isNaN(tiempoBici) || velocidadBici <= 0 || tiempoBici <= 0 ||
-        isNaN(velocidadAuto) || isNaN(tiempoAuto) || velocidadAuto <= 0 || tiempoAuto <= 0) {
+    if (isNaN(velocidadInicial) || velocidadInicial <= 0 || isNaN(tiempo) || tiempo <= 0) {
         document.getElementById('resultados').innerHTML = `
             <h2>Error</h2>
             <p>Por favor ingrese valores válidos para todas las entradas.</p>
@@ -15,73 +14,99 @@ document.getElementById('simular').addEventListener('click', function() {
         return;
     }
 
-    // Factores importantes
+    // Factores de emisión y consumo para cada tipo de vehículo
     const EMISIONES_CO2_POR_LITRO = 2.3; // kg CO2 por litro de gasolina
-    const CONSUMO_PROMEDIO_AUTOMOVIL = 0.09; // litros por km
+    const CONSUMO_PROMEDIO = {
+        "automovil": 0.09,    // litros por km
+        "camioneta": 0.12,    // litros por km
+        "camion": 0.3         // litros por km
+    };
+    const consumoPromedio = CONSUMO_PROMEDIO[tipoVehiculo];
 
-    // Calcular distancias
-    const distanciaBici = velocidadBici * tiempoBici;
-    const distanciaAuto = velocidadAuto * tiempoAuto;
+    let distancia, emisiones;
 
-    // Calcular consumo de combustible del automóvil
-    const consumoAuto = CONSUMO_PROMEDIO_AUTOMOVIL * distanciaAuto;
+    if (tipoMovimiento === "MRU") {
+        // Movimiento Rectilíneo Uniforme (MRU)
+        distancia = velocidadInicial * tiempo;
+    } else {
+        // Movimiento Rectilíneo Uniformemente Acelerado (MRUA)
+        const numIntervalos = parseInt(prompt("¿Cuántos intervalos de velocidad desea?"));
+        if (isNaN(numIntervalos) || numIntervalos <= 0) {
+            alert("Número de intervalos inválido.");
+            return;
+        }
 
-    // Calcular emisiones de CO2 del automóvil
-    const emisionesAuto = consumoAuto * EMISIONES_CO2_POR_LITRO;
+        distancia = 0;
+        let velocidad = velocidadInicial;
+        const intervalos = [];
+
+        for (let i = 1; i <= numIntervalos; i++) {
+            const nuevoTiempo = tiempo / numIntervalos;
+            velocidad = parseFloat(prompt(`Ingrese la velocidad para el intervalo ${i}:`));
+
+            if (isNaN(velocidad) || velocidad < 0) {
+                alert("Velocidad inválida.");
+                return;
+            }
+
+            distancia += velocidad * nuevoTiempo;
+            intervalos.push({ tiempo: nuevoTiempo * i, velocidad });
+        }
+
+        // Generar tabla de velocidad vs tiempo
+        generarTabla(intervalos);
+    }
+
+    // Calcular consumo y emisiones de CO2
+    const consumo = consumoPromedio * distancia;
+    emisiones = consumo * EMISIONES_CO2_POR_LITRO;
 
     // Mostrar resultados
     document.getElementById('resultados').innerHTML = `
         <h2>Resultados</h2>
-        <p>Distancia recorrida en bicicleta: ${distanciaBici.toFixed(2)} km</p>
-        <p>Distancia recorrida en automóvil: ${distanciaAuto.toFixed(2)} km</p> <!-- Añadido -->
-        <p>Consumo de combustible del automóvil: ${consumoAuto.toFixed(2)} L</p>
-        <p>Emisiones de CO2 generadas por el automóvil: ${emisionesAuto.toFixed(2)} kg</p>
-        <p>Emisiones de CO2 evitadas por usar la bicicleta: ${emisionesAuto.toFixed(2)} kg</p>
+        <p>Distancia recorrida: ${distancia.toFixed(2)} km</p>
+        <p>Consumo de combustible: ${consumo.toFixed(2)} L</p>
+        <p>Emisiones de CO2: ${emisiones.toFixed(2)} kg</p>
     `;
 
-    // Iniciar animación sincronizada
-    moverVehiculos(distanciaBici, distanciaAuto, velocidadBici, velocidadAuto);
+    // Almacenar datos para el diagrama de barras
+    almacenarDatosEmisiones(tipoVehiculo, emisiones);
+    actualizarDiagramaEmisiones();
 });
 
-function moverVehiculos(distanciaBici, distanciaAuto, velocidadBici, velocidadAuto) {
-    const bicicleta = document.getElementById('bicicleta');
-    const carro = document.getElementById('carro');
-    
-    // Reiniciar posiciones iniciales
-    bicicleta.style.transform = 'translateX(0)';
-    carro.style.transform = 'translateX(0)';
-    
-    // Obtener el ancho de la carretera
-    const carretera = document.querySelector('.carretera');
-    const anchoCarretera = carretera.clientWidth; // Ancho real del contenedor
-
-    // Asegurarse de que la distancia no exceda el ancho de la carretera
-    const distanciaMaximaBici = Math.min(distanciaBici * 10, anchoCarretera); // Multiplicamos por 10 para la visualización
-    const distanciaMaximaAuto = Math.min(distanciaAuto * 10, anchoCarretera); // Multiplicamos por 10 para la visualización
-
-    // Calcular la duración en milisegundos para mover la bicicleta y el carro
-    const duracionBici = (distanciaBici / velocidadBici) * 1000; // convertir a milisegundos
-    const duracionAuto = (distanciaAuto / velocidadAuto) * 1000; // convertir a milisegundos
-
-    bicicleta.style.transition = `transform ${duracionBici}ms linear`;
-    carro.style.transition = `transform ${duracionAuto}ms linear`;
-
-    // Mover ambos vehículos en la misma dirección
-    bicicleta.style.transform = `translateX(${distanciaMaximaBici}px)`; 
-    carro.style.transform = `translateX(${distanciaMaximaAuto}px)`;
+function generarTabla(intervalos) {
+    let tablaHTML = `<table><tr><th>Tiempo (s)</th><th>Velocidad (km/h)</th></tr>`;
+    intervalos.forEach(intervalo => {
+        tablaHTML += `<tr><td>${intervalo.tiempo.toFixed(2)}</td><td>${intervalo.velocidad.toFixed(2)}</td></tr>`;
+    });
+    tablaHTML += `</table>`;
+    document.getElementById('tabla_velocidad').innerHTML = tablaHTML;
 }
 
-// Evento para reiniciar la animación
-document.getElementById('reiniciar').addEventListener('click', function() {
-    const bicicleta = document.getElementById('bicicleta');
-    const carro = document.getElementById('carro');
+const datosEmisiones = { "automovil": 0, "camioneta": 0, "camion": 0 };
 
-    // Quitar transición y volver a la posición inicial
-    bicicleta.style.transition = 'none';
-    carro.style.transition = 'none';
-    bicicleta.style.transform = 'translateX(0)';
-    carro.style.transform = 'translateX(0)';
+function almacenarDatosEmisiones(tipoVehiculo, emisiones) {
+    datosEmisiones[tipoVehiculo] += emisiones;
+}
 
-    // Limpiar resultados
-    document.getElementById('resultados').innerHTML = '';
-});
+function actualizarDiagramaEmisiones() {
+    // Ejemplo de código para actualizar un diagrama de barras (se puede hacer con Chart.js o cualquier otra librería de gráficos)
+    const ctx = document.getElementById('diagramaEmisiones').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Automóvil', 'Camioneta', 'Camión'],
+            datasets: [{
+                label: 'Emisiones de CO2 (kg)',
+                data: [datosEmisiones.automovil, datosEmisiones.camioneta, datosEmisiones.camion],
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+}
