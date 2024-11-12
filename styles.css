@@ -1,121 +1,93 @@
-/* Estilos generales */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
-    color: #333;
-    margin: 0;
-    padding: 0;
+    margin: 20px;
+    background-color: #f4f4f4;
 }
 
 .container {
-    width: 80%;
-    max-width: 1200px;
-    margin: auto;
+    max-width: 600px;
+    margin: 0 auto;
     padding: 20px;
-    background-color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
+    background:
+        url('images/Decoracion.png') no-repeat,
+        url('images/logo.png') repeat;
+    background-size: cover, 80px 80px;
+    background-position: left center, right center;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
 
-/* Título */
 h1 {
-    text-align: center;
-    color: #333;
     margin-bottom: 20px;
 }
 
-/* Formulario */
-label {
-    font-weight: bold;
-    margin-top: 10px;
-    display: inline-block;
+.animacion {
+    position: relative;
+    height: 200px;
+    margin: 20px 0;
+    overflow: hidden;
 }
 
-select, input[type="number"] {
+.carretera {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    background-image: url('https://img.freepik.com/vector-premium/vista-superior-carretera-camino-calle-asfalto-dibujos-animados_543062-3276.jpg?w=740');
+    background-size: cover;
+    background-repeat: repeat-x;
+    border-radius: 10px;
+    animation: moverCarretera 5s linear infinite;
+}
+
+.carro {
+    width: 175px;
+    position: absolute;
+    bottom: 5px;
+    left: 0;
+}
+
+@keyframes moverCarretera {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: -1000px 0;
+    }
+}
+
+label {
+    margin: 10px 0 5px;
+    display: block;
+}
+
+input, select {
     width: 100%;
     padding: 8px;
-    margin-top: 5px;
     margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1em;
 }
 
 button {
-    padding: 10px 20px;
-    background-color: #007bff;
+    padding: 10px 15px;
+    background-color: #007BFF;
     color: #fff;
     border: none;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 1em;
-    margin-top: 10px;
-    display: inline-block;
 }
 
 button:hover {
     background-color: #0056b3;
 }
 
-/* Tabla de Resultados */
-#tabla_resultados {
-    margin-top: 30px;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
+#resultados {
     margin-top: 20px;
-    font-size: 0.9em;
-    background-color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-    border-radius: 8px;
-    overflow: hidden;
 }
 
-table, th, td {
-    border: 1px solid #ddd;
-    text-align: center;
-    padding: 12px;
-}
-
-th {
-    background-color: #007bff;
-    color: white;
-    font-weight: bold;
-}
-
-td {
-    background-color: #f9f9f9;
-}
-
-/* Gráficos */
-#graficos {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 30px;
-    gap: 20px;
+#tabla_velocidad {
+    margin-top: 20px;
 }
 
 canvas {
-    background-color: #ffffff;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .container {
-        width: 95%;
-    }
-
-    #graficos {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    canvas {
-        width: 90%;
-    }
+    margin-top: 20px;
 }
