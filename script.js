@@ -123,21 +123,16 @@ document.addEventListener('DOMContentLoaded', function() {
             scales: {
                 x: { title: { display: true, text: 'Tiempo (h)' } },
                 y: { title: { display: true, text: 'Velocidad (km/h)' } }
+            },
+            plugins: {
+                legend: { display: true },
+                tooltip: { enabled: true },
+                backgroundColor: 'white' // Establecer el color de fondo directamente
             }
-        },
-        plugins: [{
-            id: 'customCanvasBackgroundColor',
-            beforeDraw: (chart) => {
-                const ctx = chart.canvas.getContext('2d');
-                ctx.save();
-                ctx.globalCompositeOperation = 'destination-over'; // Dibuja detrás del gráfico
-                ctx.fillStyle = 'white';  // Color de fondo
-                ctx.fillRect(0, 0, chart.width, chart.height);
-                ctx.restore();
-            }
-        }]
+        }
     });
 }
+
 
 
 
