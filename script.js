@@ -137,5 +137,16 @@ function mostrarGraficoEmisiones(emisiones) {
             labels: ['Vehículo'],
             datasets: [{
                 label: 'Emisiones de CO2 (kg)',
-                data: [em
-
+                data: [emisiones],
+                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Emisiones (kg)' } }
+            }
+        }
+    });
+}
