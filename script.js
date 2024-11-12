@@ -1,4 +1,63 @@
 document.addEventListener('DOMContentLoaded', function() {
+    let velocidadChart = null;
+    let emisionesChart = null;
+
+    // Configuración inicial para el gráfico de velocidad vs tiempo
+    function inicializarGraficoVelocidadTiempo() {
+        const ctx = document.getElementById('graficoVelocidadTiempo').getContext('2d');
+        velocidadChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Velocidad vs Tiempo',
+                    data: [],
+                    borderColor: 'blue',
+                    fill: false
+                }]
+            },
+            options: {
+                scales: {
+                    x: { title: { display: true, text: 'Tiempo (h)' } },
+                    y: { title: { display: true, text: 'Velocidad (km/h)' } }
+                },
+                plugins: {
+                    legend: { display: true },
+                    tooltip: { enabled: true }
+                }
+            }
+        });
+    }
+
+    // Configuración inicial para el gráfico de emisiones de CO2
+    function inicializarGraficoEmisiones() {
+        const ctx = document.getElementById('graficoEmisiones').getContext('2d');
+        emisionesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [], // Aquí podrías añadir 'Simulación 1', 'Simulación 2', etc.
+                datasets: [{
+                    label: 'Emisiones de CO2 (kg)',
+                    data: [],
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: { 
+                        beginAtZero: true, 
+                        title: { display: true, text: 'Emisiones (kg)' } 
+                    }
+                }
+            }
+        });
+    }
+
+    inicializarGraficoVelocidadTiempo();
+    inicializarGraficoEmisiones();
+
     // Mostrar opciones de movimiento tras seleccionar el tipo de vehículo
     document.getElementById('tipo_vehiculo').addEventListener('change', function() {
         document.getElementById('movimiento_options').style.display = 'block';
@@ -98,85 +157,17 @@ document.addEventListener('DOMContentLoaded', function() {
             <p>Total de emisiones de CO2 para ${tipoVehiculo}: ${emisionesTotal.toFixed(2)} kg</p>
         `;
 
-        mostrarGraficoVelocidadTiempo(velocidadVsTiempo);
-        mostrarGraficoEmisiones(emisionesTotal);
+        // Agregar datos de la nueva simulación al gráfico de velocidad vs tiempo
+        velocidadVsTiempo.forEach((punto) => {
+            velocidadChart.data.labels.push(punto.tiempo);
+            velocidadChart.data.datasets[0].data.push(punto.velocidad);
+        });
+        velocidadChart.update();
+
+        // Agregar nueva barra para la emisión total de esta simulación
+        emisionesChart.data.labels.push(`Simulación ${emisionesChart.data.labels.length + 1}`);
+        emisionesChart.data.datasets[0].data.push(emisionesTotal);
+        emisionesChart.update();
     });
-
-    // Mostrar gráfico de velocidad vs tiempo
-       function mostrarGraficoVelocidadTiempo(datos) {
-    const ctx = document.getElementById('graficoVelocidadTiempo').getContext('2d');
-    const tiempos = datos.map(d => d.tiempo);
-    const velocidades = datos.map(d => d.velocidad);
-
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: tiempos,
-            datasets: [{
-                label: 'Velocidad vs Tiempo',
-                data: velocidades,
-                borderColor: 'blue',
-                fill: false
-            }]
-        },
-        options: {
-            scales: {
-                x: { title: { display: true, text: 'Tiempo (h)' } },
-                y: { title: { display: true, text: 'Velocidad (km/h)' } }
-            },
-            plugins: {
-                legend: { display: true },
-                tooltip: { enabled: true },
-                backgroundColor: 'white' // Establecer el color de fondo directamente
-            }
-        }
-    });
-}
-
-
-
-
-    // Mostrar gráfico de emisiones de CO2
-    function mostrarGraficoEmisiones(emisiones) {
-        const ctx = document.getElementById('graficoEmisiones').getContext('2d');
-
-            new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Vehículo'],
-            datasets: [{
-                label: 'Emisiones de CO2 (kg)',
-                data: [emisiones],
-                backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                borderColor: 'rgba(255, 99, 132, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: { 
-                    beginAtZero: true, 
-                    title: { display: true, text: 'Emisiones (kg)' } 
-                }
-            },
-            plugins: {
-                // Plugin que establece el color de fondo blanco
-                background: {
-                    color: 'white'
-                }
-            }
-        },
-        plugins: [{
-            id: 'background',
-            beforeDraw: (chart) => {
-                const ctx = chart.canvas.getContext('2d');
-                ctx.save();
-                ctx.fillStyle = 'white';
-                ctx.fillRect(0, 0, chart.width, chart.height);
-                ctx.restore();
-            }
-        }]
-    });
-
-    }
 });
+
