@@ -1,7 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    let emisionesHistoricas = []; // Para almacenar emisiones de todas las simulaciones
-    let velocidadVsTiempoHistorico = []; // Para almacenar velocidad vs. tiempo de todas las simulaciones
-
     // Mostrar opciones de movimiento tras seleccionar el tipo de vehículo
     document.getElementById('tipo_vehiculo').addEventListener('change', function() {
         document.getElementById('movimiento_options').style.display = 'block';
@@ -107,8 +104,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Mostrar gráfico de velocidad vs tiempo
     function mostrarGraficoVelocidadTiempo(datos) {
-        velocidadVsTiempoHistorico.push(datos); // Agregar la nueva simulación al histórico
-
         const ctx = document.getElementById('graficoVelocidadTiempo').getContext('2d');
         const tiempos = datos.map(d => d.tiempo);
         const velocidades = datos.map(d => d.velocidad);
@@ -117,18 +112,14 @@ document.addEventListener('DOMContentLoaded', function() {
             type: 'line',
             data: {
                 labels: tiempos,
-                datasets: velocidadVsTiempoHistorico.map((data, index) => ({
-                    label: `Simulación ${index + 1}`,
-                    data: data.map(d => d.velocidad),
-                    borderColor: `hsl(${(index * 70) % 360}, 70%, 50%)`, // Color único para cada simulación
-                    fill: false,
-                    backgroundColor: 'white' // Fondo blanco
-                }))
+                datasets: [{
+                    label: 'Velocidad vs Tiempo',
+                    data: velocidades,
+                    borderColor: 'blue',
+                    fill: false
+                }]
             },
             options: {
-                plugins: {
-                    legend: { display: true },
-                },
                 scales: {
                     x: { title: { display: true, text: 'Tiempo (h)' } },
                     y: { title: { display: true, text: 'Velocidad (km/h)' } }
@@ -139,27 +130,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Mostrar gráfico de emisiones de CO2
     function mostrarGraficoEmisiones(emisiones) {
-        emisionesHistoricas.push(emisiones); // Agregar emisiones al histórico
-
         const ctx = document.getElementById('graficoEmisiones').getContext('2d');
 
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: emisionesHistoricas.map((_, i) => `Simulación ${i + 1}`),
+                labels: ['Vehículo'],
                 datasets: [{
                     label: 'Emisiones de CO2 (kg)',
-                    data: emisionesHistoricas,
+                    data: [emisiones],
                     backgroundColor: 'rgba(255, 99, 132, 0.5)',
                     borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1,
-                    backgroundColor: 'white' // Fondo blanco
+                    borderWidth: 1
                 }]
             },
             options: {
-                plugins: {
-                    legend: { display: true },
-                },
                 scales: {
                     y: { beginAtZero: true, title: { display: true, text: 'Emisiones (kg)' } }
                 }
@@ -167,5 +152,3 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-
-
