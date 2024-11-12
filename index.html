@@ -11,6 +11,13 @@
     <div class="container">
         <h1>Simulador de Reducción de Emisiones</h1>
 
+        <div class="animacion">
+            <div class="carretera">
+                <img id="carro" class="carro" src="images/carro.png" alt="Carro emitiendo CO2">
+            </div>
+        </div>
+
+        <!-- Selección de tipo de vehículo -->
         <label for="tipo_vehiculo"><strong>Tipo de Vehículo:</strong></label>
         <select id="tipo_vehiculo">
             <option value="" disabled selected>Seleccione un vehículo</option>
@@ -19,6 +26,7 @@
             <option value="camion">Camión</option>
         </select>
 
+        <!-- Selección de tipo de movimiento -->
         <div id="movimiento_options" style="display: none;">
             <label for="tipo_movimiento"><strong>Tipo de Movimiento:</strong></label>
             <select id="tipo_movimiento">
@@ -28,46 +36,27 @@
             </select>
         </div>
 
-        <div id="variable_faltante_container" style="display: none;">
-            <label for="variable_faltante"><strong>Variable Faltante:</strong></label>
-            <select id="variable_faltante">
-                <option value="" disabled selected>Seleccione una variable faltante</option>
-                <option value="velocidad">Velocidad</option>
-                <option value="tiempo">Tiempo</option>
-                <option value="distancia">Distancia</option>
-            </select>
+        <!-- Datos para MRU -->
+        <div id="mru_data" style="display: none;">
+            <label for="velocidad_auto"><strong>Velocidad del Vehículo (km/h):</strong></label>
+            <input type="number" id="velocidad_auto" placeholder="Ej. 40">
+            <label for="tiempo_auto"><strong>Tiempo del Vehículo (horas):</strong></label>
+            <input type="number" id="tiempo_auto" placeholder="Ej. 1">
         </div>
 
-        <div id="mru_data" style="display: none;">
-            <label for="velocidad_auto"><strong>Velocidad (km/h):</strong></label>
-            <input type="number" id="velocidad_auto" placeholder="Ej. 40">
-            <label for="tiempo_auto"><strong>Tiempo (horas):</strong></label>
-            <input type="number" id="tiempo_auto" placeholder="Ej. 1">
-            <label for="distancia_auto"><strong>Distancia (km):</strong></label>
-            <input type="number" id="distancia_auto" placeholder="Ej. 100">
+        <!-- Datos para MRUA -->
+        <div id="mrua_data" style="display: none;">
+            <label for="num_intervals"><strong>Número de Intervalos:</strong></label>
+            <input type="number" id="num_intervals" min="1" placeholder="Ej. 3">
+            <div id="intervals_container"></div>
         </div>
 
         <button id="simular">Simular</button>
         <button id="reiniciar">Reiniciar</button>
 
-        <div id="tabla_resultados">
-            <h2>Tabla de Resultados</h2>
-            <table id="tabla_emisiones">
-                <thead>
-                    <tr>
-                        <th>Vehículo</th>
-                        <th>Tipo de Movimiento</th>
-                        <th>Emisiones CO2 (kg)</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-
-        <div id="graficos">
-            <canvas id="graficoVelocidadTiempo"></canvas>
-            <canvas id="graficoEmisiones"></canvas>
-        </div>
+        <div id="resultados"></div>
+        <canvas id="graficoVelocidadTiempo"></canvas>
+        <canvas id="graficoEmisiones"></canvas>
     </div>
 
     <script src="script.js"></script>
