@@ -103,11 +103,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Mostrar gráfico de velocidad vs tiempo
-    function mostrarGraficoVelocidadTiempo(datos) {
+       function mostrarGraficoVelocidadTiempo(datos) {
         const ctx = document.getElementById('graficoVelocidadTiempo').getContext('2d');
         const tiempos = datos.map(d => d.tiempo);
         const velocidades = datos.map(d => d.velocidad);
-
+    
         new Chart(ctx, {
             type: 'line',
             data: {
@@ -123,10 +123,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 scales: {
                     x: { title: { display: true, text: 'Tiempo (h)' } },
                     y: { title: { display: true, text: 'Velocidad (km/h)' } }
+                },
+                plugins: {
+                    // Configuración del fondo blanco
+                    background: {
+                        color: 'white'
+                    }
                 }
-            }
+            },
+            plugins: [{
+                id: 'background',
+                beforeDraw: (chart) => {
+                    const ctx = chart.canvas.getContext('2d');
+                    ctx.save();
+                    ctx.fillStyle = 'white';  // Color de fondo
+                    ctx.fillRect(0, 0, chart.width, chart.height);
+                    ctx.restore();
+                }
+            }]
         });
     }
+
 
     // Mostrar gráfico de emisiones de CO2
     function mostrarGraficoEmisiones(emisiones) {
