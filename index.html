@@ -17,21 +17,26 @@
             </div>
         </div>
 
+        <!-- Selección de tipo de vehículo -->
         <label for="tipo_vehiculo"><strong>Tipo de Vehículo:</strong></label>
         <select id="tipo_vehiculo">
+            <option value="" disabled selected>Seleccione un vehículo</option>
             <option value="automovil">Automóvil</option>
             <option value="suv">SUV</option>
             <option value="camion">Camión</option>
         </select>
 
+        <!-- Selección de tipo de movimiento -->
         <div id="movimiento_options" style="display: none;">
             <label for="tipo_movimiento"><strong>Tipo de Movimiento:</strong></label>
             <select id="tipo_movimiento">
+                <option value="" disabled selected>Seleccione el movimiento</option>
                 <option value="mru">MRU</option>
                 <option value="mrua">MRUA</option>
             </select>
         </div>
 
+        <!-- Datos para MRU -->
         <div id="mru_data" style="display: none;">
             <label for="velocidad_auto"><strong>Velocidad del Vehículo (km/h):</strong></label>
             <input type="number" id="velocidad_auto" placeholder="Ej. 40">
@@ -39,6 +44,7 @@
             <input type="number" id="tiempo_auto" placeholder="Ej. 1">
         </div>
 
+        <!-- Datos para MRUA -->
         <div id="mrua_data" style="display: none;">
             <label for="num_intervals"><strong>Número de Intervalos:</strong></label>
             <input type="number" id="num_intervals" min="1" placeholder="Ej. 3">
