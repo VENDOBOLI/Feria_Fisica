@@ -1,62 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
-    let velocidadChart = null;
-    let emisionesChart = null;
-
-    // Configuración inicial para el gráfico de velocidad vs tiempo
-    function inicializarGraficoVelocidadTiempo() {
-        const ctx = document.getElementById('graficoVelocidadTiempo').getContext('2d');
-        velocidadChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Velocidad vs Tiempo',
-                    data: [],
-                    borderColor: 'blue',
-                    fill: false
-                }]
-            },
-            options: {
-                scales: {
-                    x: { title: { display: true, text: 'Tiempo (h)' } },
-                    y: { title: { display: true, text: 'Velocidad (km/h)' } }
-                },
-                plugins: {
-                    legend: { display: true },
-                    tooltip: { enabled: true }
-                }
-            }
-        });
-    }
-
-    // Configuración inicial para el gráfico de emisiones de CO2
-    function inicializarGraficoEmisiones() {
-        const ctx = document.getElementById('graficoEmisiones').getContext('2d');
-        emisionesChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: [], // Aquí podrías añadir 'Simulación 1', 'Simulación 2', etc.
-                datasets: [{
-                    label: 'Emisiones de CO2 (kg)',
-                    data: [],
-                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: { 
-                        beginAtZero: true, 
-                        title: { display: true, text: 'Emisiones (kg)' } 
-                    }
-                }
-            }
-        });
-    }
-
-    inicializarGraficoVelocidadTiempo();
-    inicializarGraficoEmisiones();
+    let colorIndex = 0;
+    const colors = ['blue', 'green', 'red', 'purple', 'orange']; // Colores para cada simulación
 
     // Mostrar opciones de movimiento tras seleccionar el tipo de vehículo
     document.getElementById('tipo_vehiculo').addEventListener('change', function() {
@@ -141,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const CONSUMO_PROMEDIO = tipoVehiculo === 'automovil' ? 0.09 : tipoVehiculo === 'suv' ? 0.12 : 0.15;
         let emisionesTotal = 0;
         let tiempoAcumulado = 0;
-        let velocidadVsTiempo = [];
+        let velocidadVsTiempo = [{ tiempo: 0, velocidad: 0 }]; // Comienza desde el origen
 
         for (let i = 0; i < velocidades.length; i++) {
             const distancia = velocidades[i] * tiempos[i];
@@ -157,17 +101,71 @@ document.addEventListener('DOMContentLoaded', function() {
             <p>Total de emisiones de CO2 para ${tipoVehiculo}: ${emisionesTotal.toFixed(2)} kg</p>
         `;
 
-        // Agregar datos de la nueva simulación al gráfico de velocidad vs tiempo
-        velocidadVsTiempo.forEach((punto) => {
-            velocidadChart.data.labels.push(punto.tiempo);
-            velocidadChart.data.datasets[0].data.push(punto.velocidad);
-        });
-        velocidadChart.update();
-
-        // Agregar nueva barra para la emisión total de esta simulación
-        emisionesChart.data.labels.push(`Simulación ${emisionesChart.data.labels.length + 1}`);
-        emisionesChart.data.datasets[0].data.push(emisionesTotal);
-        emisionesChart.update();
+        mostrarGraficoVelocidadTiempo(velocidadVsTiempo);
+        mostrarGraficoEmisiones(emisionesTotal);
     });
+
+    // Mostrar gráfico de velocidad vs tiempo
+    function mostrarGraficoVelocidadTiempo(datos) {
+        const ctx = document.getElementById('graficoVelocidadTiempo').getContext('2d');
+        const tiempos = datos.map(d => d.tiempo);
+        const velocidades = datos.map(d => d.velocidad);
+
+        // Cambiar el color de la línea en cada simulación
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: tiempos,
+                datasets: [{
+                    label: `Simulación ${colorIndex + 1}`,
+                    data: velocidades,
+                    borderColor: colors[colorIndex % colors.length],
+                    fill: false
+                }]
+            },
+            options: {
+                scales: {
+                    x: { title: { display: true, text: 'Tiempo (h)' } },
+                    y: { title: { display: true, text: 'Velocidad (km/h)' } }
+                },
+                plugins: {
+                    legend: { display: true },
+                    tooltip: { enabled: true },
+                }
+            }
+        });
+        colorIndex++;
+    }
+
+    // Mostrar gráfico de emisiones de CO2
+    function mostrarGraficoEmisiones(emisiones) {
+        const ctx = document.getElementById('graficoEmisiones').getContext('2d');
+        const chart = Chart.getChart(ctx);
+
+        if (!chart) {
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [`Simulación ${colorIndex}`],
+                    datasets: [{
+                        label: 'Emisiones de CO2 (kg)',
+                        data: [emisiones],
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true, title: { display: true, text: 'Emisiones (kg)' } }
+                    },
+                }
+            });
+        } else {
+            chart.data.labels.push(`Simulación ${colorIndex}`);
+            chart.data.datasets[0].data.push(emisiones);
+            chart.update();
+        }
+    }
 });
 
