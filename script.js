@@ -1,96 +1,65 @@
 document.addEventListener('DOMContentLoaded', function() {
-    let emisionesDataset = [];  // Para almacenar emisiones acumuladas
-    let velocidadTiempoDataset = [];  // Para almacenar los datos de velocidad vs tiempo
+    let emisionesHistoricas = []; // Para almacenar emisiones de todas las simulaciones
+    let velocidadVsTiempoHistorico = []; // Para almacenar velocidad vs. tiempo de todas las simulaciones
 
-    // Función para acumular los datos en cada simulación
-    function agregarSimulacion(velocidadVsTiempo, emisiones, tipoVehiculo) {
-        // Agregar los datos de velocidad vs tiempo
-        velocidadVsTiempo.forEach((dato, index) => {
-            if (velocidadTiempoDataset[index]) {
-                velocidadTiempoDataset[index].data.push(dato.velocidad);
-            } else {
-                velocidadTiempoDataset[index] = { tiempo: dato.tiempo, data: [dato.velocidad] };
-            }
-        });
+    // Mostrar opciones de movimiento tras seleccionar el tipo de vehículo
+    document.getElementById('tipo_vehiculo').addEventListener('change', function() {
+        document.getElementById('movimiento_options').style.display = 'block';
+        document.getElementById('mru_data').style.display = 'none';
+        document.getElementById('mrua_data').style.display = 'none';
+    });
 
-        // Agregar las emisiones totales al conjunto de datos de emisiones
-        emisionesDataset.push({ tipo: tipoVehiculo, emisiones });
-    }
+    // Mostrar el formulario de datos específico según el tipo de movimiento
+    document.getElementById('tipo_movimiento').addEventListener('change', function() {
+        const movimiento = document.getElementById('tipo_movimiento').value;
 
-    // Modificar el gráfico de velocidad vs tiempo
-    function mostrarGraficoVelocidadTiempo() {
-        const ctx = document.getElementById('graficoVelocidadTiempo').getContext('2d');
-        const tiempos = velocidadTiempoDataset.map(d => d.tiempo);
-        const datasets = velocidadTiempoDataset.map((d, index) => ({
-            label: `Simulación ${index + 1}`,
-            data: d.data,
-            borderColor: 'blue',
-            fill: false,
-            backgroundColor: 'white',
-        }));
+        if (movimiento === 'mru') {
+            document.getElementById('mru_data').style.display = 'block';
+            document.getElementById('mrua_data').style.display = 'none';
+        } else if (movimiento === 'mrua') {
+            document.getElementById('mru_data').style.display = 'none';
+            document.getElementById('mrua_data').style.display = 'block';
+        }
+    });
 
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: tiempos,
-                datasets: datasets,
-            },
-            options: {
-                scales: {
-                    x: { title: { display: true, text: 'Tiempo (h)' } },
-                    y: { title: { display: true, text: 'Velocidad (km/h)' } },
-                },
-                plugins: {
-                    legend: { display: true },
-                    tooltip: { backgroundColor: 'white', titleColor: 'black' }
-                },
-            },
-        });
-    }
+    // Generar campos para cada intervalo en MRUA
+    document.getElementById('num_intervals').addEventListener('input', function() {
+        const intervalsContainer = document.getElementById('intervals_container');
+        intervalsContainer.innerHTML = ''; // Limpiar contenedor de intervalos
+        const numIntervals = parseInt(this.value);
 
-    // Modificar el gráfico de emisiones acumuladas
-    function mostrarGraficoEmisiones() {
-        const ctx = document.getElementById('graficoEmisiones').getContext('2d');
-        const labels = emisionesDataset.map(d => d.tipo);
-        const data = emisionesDataset.map(d => d.emisiones);
+        for (let i = 1; i <= numIntervals; i++) {
+            const intervalDiv = document.createElement('div');
+            intervalDiv.innerHTML = `
+                <h4>Intervalo ${i}</h4>
+                <label>Velocidad (km/h):</label>
+                <input type="number" class="velocidad_intervalo" placeholder="Velocidad para intervalo ${i}">
+                <label>Tiempo (horas):</label>
+                <input type="number" class="tiempo_intervalo" placeholder="Tiempo para intervalo ${i}">
+            `;
+            intervalsContainer.appendChild(intervalDiv);
+        }
+    });
 
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Emisiones de CO2 (kg)',
-                    data: data,
-                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1,
-                }],
-            },
-            options: {
-                scales: {
-                    y: { beginAtZero: true, title: { display: true, text: 'Emisiones (kg)' } },
-                },
-                plugins: {
-                    legend: { display: true },
-                    tooltip: { backgroundColor: 'white', titleColor: 'black' }
-                },
-                backgroundColor: 'white',
-            },
-        });
-    }
-
-    // Resto del código que procesa la simulación
+    // Simulación y cálculo de emisiones
     document.getElementById('simular').addEventListener('click', function() {
         const tipoVehiculo = document.getElementById('tipo_vehiculo').value;
         const tipoMovimiento = document.getElementById('tipo_movimiento').value;
-        
+        const resultados = document.getElementById('resultados');
+        resultados.innerHTML = '';
+
         let velocidades = [];
         let tiempos = [];
 
-        // Recolecta datos de MRU o MRUA
         if (tipoMovimiento === 'mru') {
             const velocidad = parseFloat(document.getElementById('velocidad_auto').value);
             const tiempo = parseFloat(document.getElementById('tiempo_auto').value);
+
+            if (isNaN(velocidad) || isNaN(tiempo) || velocidad <= 0 || tiempo <= 0) {
+                alert('Ingrese valores válidos para velocidad y tiempo.');
+                return;
+            }
+
             velocidades.push(velocidad);
             tiempos.push(tiempo);
         } else if (tipoMovimiento === 'mrua') {
@@ -99,8 +68,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const tiempoInputs = document.getElementsByClassName('tiempo_intervalo');
 
             for (let i = 0; i < numIntervals; i++) {
-                velocidades.push(parseFloat(velocidadInputs[i].value));
-                tiempos.push(parseFloat(tiempoInputs[i].value));
+                const velocidad = parseFloat(velocidadInputs[i].value);
+                const tiempo = parseFloat(tiempoInputs[i].value);
+
+                if (isNaN(velocidad) || isNaN(tiempo) || velocidad <= 0 || tiempo <= 0) {
+                    alert(`Ingrese valores válidos para el intervalo ${i + 1}.`);
+                    return;
+                }
+
+                velocidades.push(velocidad);
+                tiempos.push(tiempo);
             }
         }
 
@@ -119,8 +96,76 @@ document.addEventListener('DOMContentLoaded', function() {
             velocidadVsTiempo.push({ tiempo: tiempoAcumulado, velocidad: velocidades[i] });
         }
 
-        agregarSimulacion(velocidadVsTiempo, emisionesTotal, tipoVehiculo);
-        mostrarGraficoVelocidadTiempo();
-        mostrarGraficoEmisiones();
+        resultados.innerHTML = `
+            <h2>Resultados</h2>
+            <p>Total de emisiones de CO2 para ${tipoVehiculo}: ${emisionesTotal.toFixed(2)} kg</p>
+        `;
+
+        mostrarGraficoVelocidadTiempo(velocidadVsTiempo);
+        mostrarGraficoEmisiones(emisionesTotal);
     });
+
+    // Mostrar gráfico de velocidad vs tiempo
+    function mostrarGraficoVelocidadTiempo(datos) {
+        velocidadVsTiempoHistorico.push(datos); // Agregar la nueva simulación al histórico
+
+        const ctx = document.getElementById('graficoVelocidadTiempo').getContext('2d');
+        const tiempos = datos.map(d => d.tiempo);
+        const velocidades = datos.map(d => d.velocidad);
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: tiempos,
+                datasets: velocidadVsTiempoHistorico.map((data, index) => ({
+                    label: `Simulación ${index + 1}`,
+                    data: data.map(d => d.velocidad),
+                    borderColor: `hsl(${(index * 70) % 360}, 70%, 50%)`, // Color único para cada simulación
+                    fill: false,
+                    backgroundColor: 'white' // Fondo blanco
+                }))
+            },
+            options: {
+                plugins: {
+                    legend: { display: true },
+                },
+                scales: {
+                    x: { title: { display: true, text: 'Tiempo (h)' } },
+                    y: { title: { display: true, text: 'Velocidad (km/h)' } }
+                }
+            }
+        });
+    }
+
+    // Mostrar gráfico de emisiones de CO2
+    function mostrarGraficoEmisiones(emisiones) {
+        emisionesHistoricas.push(emisiones); // Agregar emisiones al histórico
+
+        const ctx = document.getElementById('graficoEmisiones').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: emisionesHistoricas.map((_, i) => `Simulación ${i + 1}`),
+                datasets: [{
+                    label: 'Emisiones de CO2 (kg)',
+                    data: emisionesHistoricas,
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1,
+                    backgroundColor: 'white' // Fondo blanco
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { display: true },
+                },
+                scales: {
+                    y: { beginAtZero: true, title: { display: true, text: 'Emisiones (kg)' } }
+                }
+            }
+        });
+    }
 });
+
+
