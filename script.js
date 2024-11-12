@@ -1,13 +1,14 @@
+// Mostrar opciones de movimiento tras seleccionar el tipo de vehículo
 document.getElementById('tipo_vehiculo').addEventListener('change', function() {
-    // Mostrar opciones de movimiento después de seleccionar el tipo de vehículo
     document.getElementById('movimiento_options').style.display = 'block';
     document.getElementById('mru_data').style.display = 'none';
     document.getElementById('mrua_data').style.display = 'none';
 });
 
+// Mostrar el formulario de datos específico según el tipo de movimiento
 document.getElementById('tipo_movimiento').addEventListener('change', function() {
     const movimiento = document.getElementById('tipo_movimiento').value;
-    // Mostrar el formulario correspondiente según el tipo de movimiento
+    
     if (movimiento === 'mru') {
         document.getElementById('mru_data').style.display = 'block';
         document.getElementById('mrua_data').style.display = 'none';
@@ -17,9 +18,10 @@ document.getElementById('tipo_movimiento').addEventListener('change', function()
     }
 });
 
+// Generar campos para cada intervalo en MRUA
 document.getElementById('num_intervals').addEventListener('input', function() {
     const intervalsContainer = document.getElementById('intervals_container');
-    intervalsContainer.innerHTML = '';
+    intervalsContainer.innerHTML = ''; // Limpiar contenedor de intervalos
     const numIntervals = parseInt(this.value);
 
     for (let i = 1; i <= numIntervals; i++) {
@@ -35,6 +37,7 @@ document.getElementById('num_intervals').addEventListener('input', function() {
     }
 });
 
+// Simulación y cálculo de emisiones
 document.getElementById('simular').addEventListener('click', function() {
     const tipoVehiculo = document.getElementById('tipo_vehiculo').value;
     const tipoMovimiento = document.getElementById('tipo_movimiento').value;
@@ -98,6 +101,7 @@ document.getElementById('simular').addEventListener('click', function() {
     mostrarGraficoEmisiones(emisionesTotal);
 });
 
+// Mostrar gráfico de velocidad vs tiempo
 function mostrarGraficoVelocidadTiempo(datos) {
     const ctx = document.getElementById('graficoVelocidadTiempo').getContext('2d');
     const tiempos = datos.map(d => d.tiempo);
@@ -123,6 +127,7 @@ function mostrarGraficoVelocidadTiempo(datos) {
     });
 }
 
+// Mostrar gráfico de emisiones de CO2
 function mostrarGraficoEmisiones(emisiones) {
     const ctx = document.getElementById('graficoEmisiones').getContext('2d');
 
@@ -132,24 +137,5 @@ function mostrarGraficoEmisiones(emisiones) {
             labels: ['Vehículo'],
             datasets: [{
                 label: 'Emisiones de CO2 (kg)',
-                data: [emisiones],
-                backgroundColor: 'red'
-            }]
-        },
-        options: {
-            scales: {
-                y: { beginAtZero: true, title: { display: true, text: 'Emisiones (kg)' } }
-            }
-        }
-    });
-}
+                data: [em
 
-document.getElementById('reiniciar').addEventListener('click', function() {
-    document.getElementById('resultados').innerHTML = '';
-    document.getElementById('graficoVelocidadTiempo').getContext('2d').clearRect(0, 0, 400, 400);
-    document.getElementById('graficoEmisiones').getContext('2d').clearRect(0, 0, 400, 400);
-    document.getElementById('velocidad_auto').value = '';
-    document.getElementById('tiempo_auto').value = '';
-    document.getElementById('num_intervals').value = '';
-    document.getElementById('intervals_container').innerHTML = '';
-});
