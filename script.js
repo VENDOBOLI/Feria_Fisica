@@ -1,11 +1,19 @@
+document.getElementById('tipo_vehiculo').addEventListener('change', function() {
+    // Mostrar opciones de movimiento después de seleccionar el tipo de vehículo
+    document.getElementById('movimiento_options').style.display = 'block';
+    document.getElementById('mru_data').style.display = 'none';
+    document.getElementById('mrua_data').style.display = 'none';
+});
+
 document.getElementById('tipo_movimiento').addEventListener('change', function() {
     const movimiento = document.getElementById('tipo_movimiento').value;
-    const mruaContainer = document.getElementById('mrua_intervals');
-    if (movimiento === 'mrua') {
-        mruaContainer.style.display = 'block';
-    } else {
-        mruaContainer.style.display = 'none';
-        document.getElementById('intervals_container').innerHTML = '';
+    // Mostrar el formulario correspondiente según el tipo de movimiento
+    if (movimiento === 'mru') {
+        document.getElementById('mru_data').style.display = 'block';
+        document.getElementById('mrua_data').style.display = 'none';
+    } else if (movimiento === 'mrua') {
+        document.getElementById('mru_data').style.display = 'none';
+        document.getElementById('mrua_data').style.display = 'block';
     }
 });
 
@@ -28,6 +36,7 @@ document.getElementById('num_intervals').addEventListener('input', function() {
 });
 
 document.getElementById('simular').addEventListener('click', function() {
+    const tipoVehiculo = document.getElementById('tipo_vehiculo').value;
     const tipoMovimiento = document.getElementById('tipo_movimiento').value;
     const resultados = document.getElementById('resultados');
     resultados.innerHTML = '';
@@ -66,10 +75,11 @@ document.getElementById('simular').addEventListener('click', function() {
     }
 
     const CO2_POR_LITRO = 2.3;
-    const CONSUMO_PROMEDIO = 0.09;
+    const CONSUMO_PROMEDIO = tipoVehiculo === 'automovil' ? 0.09 : tipoVehiculo === 'suv' ? 0.12 : 0.15;
     let emisionesTotal = 0;
     let tiempoAcumulado = 0;
     let velocidadVsTiempo = [];
+
     for (let i = 0; i < velocidades.length; i++) {
         const distancia = velocidades[i] * tiempos[i];
         const consumo = distancia * CONSUMO_PROMEDIO;
@@ -81,7 +91,7 @@ document.getElementById('simular').addEventListener('click', function() {
 
     resultados.innerHTML = `
         <h2>Resultados</h2>
-        <p>Total de emisiones de CO2: ${emisionesTotal.toFixed(2)} kg</p>
+        <p>Total de emisiones de CO2 para ${tipoVehiculo}: ${emisionesTotal.toFixed(2)} kg</p>
     `;
 
     mostrarGraficoVelocidadTiempo(velocidadVsTiempo);
