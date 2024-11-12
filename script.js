@@ -132,23 +132,43 @@ document.addEventListener('DOMContentLoaded', function() {
     function mostrarGraficoEmisiones(emisiones) {
         const ctx = document.getElementById('graficoEmisiones').getContext('2d');
 
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Vehículo'],
-                datasets: [{
-                    label: 'Emisiones de CO2 (kg)',
-                    data: [emisiones],
-                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1
-                }]
+            new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Vehículo'],
+            datasets: [{
+                label: 'Emisiones de CO2 (kg)',
+                data: [emisiones],
+                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: { 
+                    beginAtZero: true, 
+                    title: { display: true, text: 'Emisiones (kg)' } 
+                }
             },
-            options: {
-                scales: {
-                    y: { beginAtZero: true, title: { display: true, text: 'Emisiones (kg)' } }
+            plugins: {
+                // Plugin que establece el color de fondo blanco
+                background: {
+                    color: 'white'
                 }
             }
-        });
+        },
+        plugins: [{
+            id: 'background',
+            beforeDraw: (chart) => {
+                const ctx = chart.canvas.getContext('2d');
+                ctx.save();
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, chart.width, chart.height);
+                ctx.restore();
+            }
+        }]
+    });
+
     }
 });
