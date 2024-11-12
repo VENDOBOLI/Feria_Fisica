@@ -3,69 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulación de Movimiento</title>
+    <title>Simulador de Emisiones</title>
+    <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        #resultados { margin-top: 20px; }
-        table { width: 100%; margin-top: 20px; }
-        table, th, td { border: 1px solid black; border-collapse: collapse; padding: 10px; text-align: center; }
-    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>Simulador de Reducción de Emisiones</h1>
 
-    <h1>Simulación de Movimiento</h1>
-
-    <div>
-        <label for="tipo_vehiculo">Tipo de vehículo:</label>
+        <label for="tipo_vehiculo"><strong>Tipo de Vehículo:</strong></label>
         <select id="tipo_vehiculo">
+            <option value="" disabled selected>Seleccione un vehículo</option>
             <option value="automovil">Automóvil</option>
             <option value="suv">SUV</option>
             <option value="camion">Camión</option>
         </select>
+
+        <div id="movimiento_options" style="display: none;">
+            <label for="tipo_movimiento"><strong>Tipo de Movimiento:</strong></label>
+            <select id="tipo_movimiento">
+                <option value="" disabled selected>Seleccione el movimiento</option>
+                <option value="mru">MRU</option>
+                <option value="mrua">MRUA</option>
+            </select>
+        </div>
+
+        <div id="variable_faltante_container" style="display: none;">
+            <label for="variable_faltante"><strong>Variable Faltante:</strong></label>
+            <select id="variable_faltante">
+                <option value="" disabled selected>Seleccione una variable faltante</option>
+                <option value="velocidad">Velocidad</option>
+                <option value="tiempo">Tiempo</option>
+                <option value="distancia">Distancia</option>
+            </select>
+        </div>
+
+        <div id="mru_data" style="display: none;">
+            <label for="velocidad_auto"><strong>Velocidad (km/h):</strong></label>
+            <input type="number" id="velocidad_auto" placeholder="Ej. 40">
+            <label for="tiempo_auto"><strong>Tiempo (horas):</strong></label>
+            <input type="number" id="tiempo_auto" placeholder="Ej. 1">
+            <label for="distancia_auto"><strong>Distancia (km):</strong></label>
+            <input type="number" id="distancia_auto" placeholder="Ej. 100">
+        </div>
+
+        <button id="simular">Simular</button>
+        <button id="reiniciar">Reiniciar</button>
+
+        <div id="tabla_resultados">
+            <h2>Tabla de Resultados</h2>
+            <table id="tabla_emisiones">
+                <thead>
+                    <tr>
+                        <th>Vehículo</th>
+                        <th>Tipo de Movimiento</th>
+                        <th>Emisiones CO2 (kg)</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="graficos">
+            <canvas id="graficoVelocidadTiempo"></canvas>
+            <canvas id="graficoEmisiones"></canvas>
+        </div>
     </div>
 
-    <div id="movimiento_options" style="display: none;">
-        <label for="tipo_movimiento">Tipo de movimiento:</label>
-        <select id="tipo_movimiento">
-            <option value="mru">MRU</option>
-            <option value="mrua">MRUA</option>
-        </select>
-    </div>
-
-    <div id="mru_data" style="display: none;">
-        <h3>Datos para MRU:</h3>
-        <label for="velocidad_auto">Velocidad (km/h):</label>
-        <input type="number" id="velocidad_auto">
-        <br>
-        <label for="tiempo_auto">Tiempo (h):</label>
-        <input type="number" id="tiempo_auto">
-        <br>
-        <label for="distancia_auto">Distancia (km):</label>
-        <input type="number" id="distancia_auto">
-    </div>
-
-    <div id="mrua_data" style="display: none;">
-        <h3>Datos para MRUA:</h3>
-        <label for="num_intervals">Número de intervalos:</label>
-        <input type="number" id="num_intervals">
-        <br>
-        <div id="intervalos_data"></div>
-    </div>
-
-    <div id="variable_faltante" style="display: none;">
-        <h3>Seleccione la variable faltante:</h3>
-        <select id="variable_faltante">
-            <option value="velocidad">Velocidad</option>
-            <option value="tiempo">Tiempo</option>
-            <option value="distancia">Distancia</option>
-        </select>
-    </div>
-
-    <button id="simular">Simular</button>
-
-    <div id="resultados"></div>
-
-    <script src="app.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
