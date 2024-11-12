@@ -4,12 +4,15 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('movimiento_options').style.display = 'block';
         document.getElementById('mru_data').style.display = 'none';
         document.getElementById('mrua_data').style.display = 'none';
+        document.getElementById('variable_faltante').style.display = 'none';
     });
 
-    // Mostrar el formulario de datos específico según el tipo de movimiento y selección de variable faltante
+    // Mostrar el formulario de datos específico según el tipo de movimiento
     document.getElementById('tipo_movimiento').addEventListener('change', function() {
         const movimiento = document.getElementById('tipo_movimiento').value;
-
+        
+        document.getElementById('variable_faltante').style.display = 'block';
+        
         if (movimiento === 'mru') {
             document.getElementById('mru_data').style.display = 'block';
             document.getElementById('mrua_data').style.display = 'none';
@@ -17,9 +20,6 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('mru_data').style.display = 'none';
             document.getElementById('mrua_data').style.display = 'block';
         }
-
-        // Solicitar qué variable falta
-        document.getElementById('variable_faltante').style.display = 'block';
     });
 
     // Realizar el cálculo basado en la variable faltante y mostrar resultados
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const tipoMovimiento = document.getElementById('tipo_movimiento').value;
         const variableFaltante = document.getElementById('variable_faltante').value;
         const resultados = document.getElementById('resultados');
-        resultados.innerHTML = '';
+        resultados.innerHTML = '';  // Limpiar resultados previos
         
         let velocidad, tiempo, distancia;
         let velocidades = [], tiempos = [];
@@ -91,18 +91,32 @@ document.addEventListener('DOMContentLoaded', function() {
             velocidadVsTiempo.push({ tiempo: tiempoAcumulado, velocidad: velocidades[i] });
         }
 
+        // Mostrar tabla de velocidad vs tiempo
+        let tablaHTML = `
+            <table border="1">
+                <tr>
+                    <th>Tiempo (h)</th>
+                    <th>Velocidad (km/h)</th>
+                </tr>`;
+        velocidadVsTiempo.forEach(dato => {
+            tablaHTML += `<tr><td>${dato.tiempo.toFixed(2)}</td><td>${dato.velocidad.toFixed(2)}</td></tr>`;
+        });
+        tablaHTML += `</table>`;
+        
         resultados.innerHTML += `
             <div>
                 <h3>Simulación: ${tipoVehiculoSimulacion}</h3>
                 <p>Total de emisiones de CO2 para ${tipoVehiculo}: ${emisionesTotal.toFixed(2)} kg</p>
+                ${tablaHTML}
             </div>
         `;
 
+        // Graficar velocidad vs tiempo y emisiones
         mostrarGraficoVelocidadTiempo(velocidadVsTiempo, tipoVehiculoSimulacion);
         mostrarGraficoEmisiones(emisionesTotal, tipoVehiculoSimulacion);
     });
 
-    // Mostrar gráfico de velocidad vs tiempo con fondo blanco
+    // Mostrar gráfico de velocidad vs tiempo
     function mostrarGraficoVelocidadTiempo(datos, titulo) {
         const canvasId = `graficoVelocidadTiempo_${titulo}`;
         const canvas = document.createElement('canvas');
@@ -134,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Mostrar gráfico de emisiones de CO2 con fondo blanco
+    // Mostrar gráfico de emisiones de CO2
     function mostrarGraficoEmisiones(emisiones, titulo) {
         const canvasId = `graficoEmisiones_${titulo}`;
         const canvas = document.createElement('canvas');
