@@ -74,6 +74,28 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    document.getElementById('num_intervals').addEventListener('input', function() {
+        const intervalsContainer = document.getElementById('intervals_container');
+        intervalsContainer.innerHTML = ''; // Limpiar contenedor de intervalos
+        const numIntervals = parseInt(this.value);
+
+        for (let i = 1; i <= numIntervals; i++) {
+            const intervalDiv = document.createElement('div');
+            intervalDiv.innerHTML = `
+                <h4>Intervalo ${i}</h4>
+                <label>Velocidad Inicial (m/s):</label>
+                <input type="number" class="velocidad_inicial_intervalo" placeholder="Velocidad inicial para intervalo ${i}">
+                <label>Velocidad Final (m/s):</label>
+                <input type="number" class="velocidad_final_intervalo" placeholder="Velocidad final para intervalo ${i}">
+                <label>Distancia (m):</label>
+                <input type="number" class="distancia_intervalo" placeholder="Distancia para intervalo ${i}">
+                <label>Tiempo (s):</label>
+                <input type="number" class="tiempo_intervalo" placeholder="Tiempo para intervalo ${i}">
+            `;
+            intervalsContainer.appendChild(intervalDiv);
+        }
+    });
+
     function calcularMRU(velocidad, distancia, tiempo) {
         if (!velocidad) velocidad = distancia / tiempo;
         if (!distancia) distancia = velocidad * tiempo;
@@ -82,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function calcularMRUA(velocidadInicial, velocidadFinal, distancia, tiempo) {
-        if (!velocidadFinal) velocidadFinal = velocidadInicial + (distancia / tiempo) * tiempo;
+        if (!velocidadFinal) velocidadFinal = velocidadInicial + (distancia / tiempo);
         if (!distancia) distancia = ((velocidadInicial + velocidadFinal) / 2) * tiempo;
         if (!tiempo) tiempo = (2 * distancia) / (velocidadInicial + velocidadFinal);
         const aceleracion = (velocidadFinal - velocidadInicial) / tiempo;
@@ -95,51 +117,67 @@ document.addEventListener('DOMContentLoaded', function() {
         const resultados = document.getElementById('resultados');
         resultados.innerHTML = '';
 
-        let velocidad = parseFloat(document.getElementById('velocidad_auto').value) / 3.6 || null;
-        let distancia = parseFloat(document.getElementById('distancia_auto').value) || null;
-        let tiempo = parseFloat(document.getElementById('tiempo_auto').value) * 3600 || null;
-
-        let calculos, aceleracion, velocidadFinal;
+        let velocidades = [];
+        let tiempos = [];
+        let distanciaTotal = 0;
+        let tiempoTotal = 0;
+        let velocidadFinal, aceleracion;
 
         if (tipoMovimiento === 'mru') {
+            let velocidad = parseFloat(document.getElementById('velocidad_auto').value) || null;
+            let distancia = parseFloat(document.getElementById('distancia_auto').value) || null;
+            let tiempo = parseFloat(document.getElementById('tiempo_auto').value) || null;
+
             if ((velocidad && tiempo) || (velocidad && distancia) || (distancia && tiempo)) {
-                calculos = calcularMRU(velocidad, distancia, tiempo);
+                const calculos = calcularMRU(velocidad, distancia, tiempo);
                 velocidadFinal = calculos.velocidad;
+                distanciaTotal = calculos.distancia;
+                tiempoTotal = calculos.tiempo;
             } else {
                 alert('Para MRU, proporcione al menos dos valores entre velocidad, distancia y tiempo.');
                 return;
             }
         } else if (tipoMovimiento === 'mrua') {
-            const velocidadInicial = velocidad || 0;
-            const velocidadFinalInput = parseFloat(document.getElementById('velocidad_final').value) / 3.6 || null;
-            distancia = distancia || null;
-            tiempo = tiempo || null;
+            const numIntervals = parseInt(document.getElementById('num_intervals').value);
+            const velocidadInicialInputs = document.getElementsByClassName('velocidad_inicial_intervalo');
+            const velocidadFinalInputs = document.getElementsByClassName('velocidad_final_intervalo');
+            const distanciaInputs = document.getElementsByClassName('distancia_intervalo');
+            const tiempoInputs = document.getElementsByClassName('tiempo_intervalo');
 
-            if ((velocidadInicial && distancia && tiempo) || (velocidadFinalInput && distancia && tiempo) || (velocidadInicial && tiempo && distancia)) {
-                calculos = calcularMRUA(velocidadInicial, velocidadFinalInput, distancia, tiempo);
-                aceleracion = calculos.aceleracion;
-                velocidadFinal = calculos.velocidadFinal;
-            } else {
-                alert('Para MRUA, proporcione al menos dos valores entre velocidad, distancia y tiempo.');
-                return;
+            for (let i = 0; i < numIntervals; i++) {
+                let velocidadInicial = parseFloat(velocidadInicialInputs[i].value) || null;
+                let velocidadFinalInput = parseFloat(velocidadFinalInputs[i].value) || null;
+                let distancia = parseFloat(distanciaInputs[i].value) || null;
+                let tiempo = parseFloat(tiempoInputs[i].value) || null;
+
+                if ((velocidadInicial && distancia && tiempo) || (velocidadFinalInput && distancia && tiempo) || (velocidadInicial && tiempo && distancia)) {
+                    const calculos = calcularMRUA(velocidadInicial, velocidadFinalInput, distancia, tiempo);
+                    velocidadFinal = calculos.velocidadFinal;
+                    distanciaTotal += calculos.distancia;
+                    tiempoTotal += calculos.tiempo;
+                    aceleracion = calculos.aceleracion;
+                } else {
+                    alert(`Para MRUA, proporcione al menos dos valores en el intervalo ${i + 1} entre velocidad, distancia y tiempo.`);
+                    return;
+                }
             }
         }
 
         const CO2_POR_LITRO = 2.3;
         const CONSUMO_PROMEDIO = tipoVehiculo === 'automovil' ? 0.09 : tipoVehiculo === 'suv' ? 0.12 : 0.15;
-        const consumo = calculos.distancia * CONSUMO_PROMEDIO;
+        const consumo = distanciaTotal * CONSUMO_PROMEDIO;
         const emisionesTotal = consumo * CO2_POR_LITRO;
 
         resultados.innerHTML = `
             <h2>Resultados</h2>
             <p>Total de emisiones de CO2 para ${tipoVehiculo}: ${emisionesTotal.toFixed(2)} kg</p>
-            <p>Distancia: ${calculos.distancia.toFixed(2)} m</p>
-            <p>Tiempo: ${calculos.tiempo.toFixed(2)} s</p>
+            <p>Distancia total: ${distanciaTotal.toFixed(2)} m</p>
+            <p>Tiempo total: ${tiempoTotal.toFixed(2)} s</p>
             <p>Velocidad Final: ${velocidadFinal.toFixed(2)} m/s</p>
             <p>Aceleración: ${aceleracion ? aceleracion.toFixed(2) + ' m/s²' : 'N/A'}</p>
         `;
 
-        velocidadChart.data.labels.push(calculos.tiempo);
+        velocidadChart.data.labels.push(tiempoTotal);
         velocidadChart.data.datasets[0].data.push(velocidadFinal);
         velocidadChart.update();
 
@@ -148,5 +186,6 @@ document.addEventListener('DOMContentLoaded', function() {
         emisionesChart.update();
     });
 });
+
 
 
