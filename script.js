@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let velocidadChart = null;
     let emisionesChart = null;
 
-    // Configuración inicial para el gráfico de velocidad vs tiempo
     function inicializarGraficoVelocidadTiempo() {
         const ctx = document.getElementById('graficoVelocidadTiempo').getContext('2d');
         velocidadChart = new Chart(ctx, {
@@ -29,7 +28,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Configuración inicial para el gráfico de emisiones de CO2
     function inicializarGraficoEmisiones() {
         const ctx = document.getElementById('graficoEmisiones').getContext('2d');
         emisionesChart = new Chart(ctx, {
@@ -76,23 +74,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    document.getElementById('num_intervals').addEventListener('input', function() {
-        const intervalsContainer = document.getElementById('intervals_container');
-        intervalsContainer.innerHTML = '';
-        const numIntervals = parseInt(this.value);
+    function calcularMRU(velocidad, distancia, tiempo) {
+        if (!velocidad) velocidad = distancia / tiempo;
+        if (!distancia) distancia = velocidad * tiempo;
+        if (!tiempo) tiempo = distancia / velocidad;
+        return { velocidad, distancia, tiempo };
+    }
 
-        for (let i = 1; i <= numIntervals; i++) {
-            const intervalDiv = document.createElement('div');
-            intervalDiv.innerHTML = `
-                <h4>Intervalo ${i}</h4>
-                <label>Velocidad (m/s):</label>
-                <input type="number" class="velocidad_intervalo" placeholder="Velocidad para intervalo ${i}">
-                <label>Tiempo (s):</label>
-                <input type="number" class="tiempo_intervalo" placeholder="Tiempo para intervalo ${i}">
-            `;
-            intervalsContainer.appendChild(intervalDiv);
-        }
-    });
+    function calcularMRUA(velocidadInicial, velocidadFinal, distancia, tiempo) {
+        if (!velocidadFinal) velocidadFinal = velocidadInicial + (distancia / tiempo) * tiempo;
+        if (!distancia) distancia = ((velocidadInicial + velocidadFinal) / 2) * tiempo;
+        if (!tiempo) tiempo = (2 * distancia) / (velocidadInicial + velocidadFinal);
+        const aceleracion = (velocidadFinal - velocidadInicial) / tiempo;
+        return { velocidadFinal, distancia, tiempo, aceleracion };
+    }
 
     document.getElementById('simular').addEventListener('click', function() {
         const tipoVehiculo = document.getElementById('tipo_vehiculo').value;
@@ -100,63 +95,52 @@ document.addEventListener('DOMContentLoaded', function() {
         const resultados = document.getElementById('resultados');
         resultados.innerHTML = '';
 
-        let velocidades = [];
-        let tiempos = [];
+        let velocidad = parseFloat(document.getElementById('velocidad_auto').value) / 3.6 || null;
+        let distancia = parseFloat(document.getElementById('distancia_auto').value) || null;
+        let tiempo = parseFloat(document.getElementById('tiempo_auto').value) * 3600 || null;
+
+        let calculos, aceleracion, velocidadFinal;
 
         if (tipoMovimiento === 'mru') {
-            const velocidad = parseFloat(document.getElementById('velocidad_auto').value);
-            const tiempo = parseFloat(document.getElementById('tiempo_auto').value);
-
-            if (isNaN(velocidad) || isNaN(tiempo) || velocidad <= 0 || tiempo <= 0) {
-                alert('Ingrese valores válidos para velocidad y tiempo.');
+            if ((velocidad && tiempo) || (velocidad && distancia) || (distancia && tiempo)) {
+                calculos = calcularMRU(velocidad, distancia, tiempo);
+                velocidadFinal = calculos.velocidad;
+            } else {
+                alert('Para MRU, proporcione al menos dos valores entre velocidad, distancia y tiempo.');
                 return;
             }
-
-            velocidades.push(velocidad / 3.6); // Convertir de km/h a m/s
-            tiempos.push(tiempo * 3600); // Convertir de horas a segundos
         } else if (tipoMovimiento === 'mrua') {
-            const numIntervals = parseInt(document.getElementById('num_intervals').value);
-            const velocidadInputs = document.getElementsByClassName('velocidad_intervalo');
-            const tiempoInputs = document.getElementsByClassName('tiempo_intervalo');
+            const velocidadInicial = velocidad || 0;
+            const velocidadFinalInput = parseFloat(document.getElementById('velocidad_final').value) / 3.6 || null;
+            distancia = distancia || null;
+            tiempo = tiempo || null;
 
-            for (let i = 0; i < numIntervals; i++) {
-                const velocidad = parseFloat(velocidadInputs[i].value);
-                const tiempo = parseFloat(tiempoInputs[i].value);
-
-                if (isNaN(velocidad) || isNaN(tiempo) || velocidad <= 0 || tiempo <= 0) {
-                    alert(`Ingrese valores válidos para el intervalo ${i + 1}.`);
-                    return;
-                }
-
-                velocidades.push(velocidad / 3.6); // Convertir de km/h a m/s
-                tiempos.push(tiempo * 3600); // Convertir de horas a segundos
+            if ((velocidadInicial && distancia && tiempo) || (velocidadFinalInput && distancia && tiempo) || (velocidadInicial && tiempo && distancia)) {
+                calculos = calcularMRUA(velocidadInicial, velocidadFinalInput, distancia, tiempo);
+                aceleracion = calculos.aceleracion;
+                velocidadFinal = calculos.velocidadFinal;
+            } else {
+                alert('Para MRUA, proporcione al menos dos valores entre velocidad, distancia y tiempo.');
+                return;
             }
         }
 
         const CO2_POR_LITRO = 2.3;
         const CONSUMO_PROMEDIO = tipoVehiculo === 'automovil' ? 0.09 : tipoVehiculo === 'suv' ? 0.12 : 0.15;
-        let emisionesTotal = 0;
-        let tiempoAcumulado = 0;
-        let velocidadVsTiempo = [];
-
-        for (let i = 0; i < velocidades.length; i++) {
-            const distancia = velocidades[i] * tiempos[i];
-            const consumo = distancia * CONSUMO_PROMEDIO;
-            const emisiones = consumo * CO2_POR_LITRO;
-            emisionesTotal += emisiones;
-            tiempoAcumulado += tiempos[i];
-            velocidadVsTiempo.push({ tiempo: tiempoAcumulado, velocidad: velocidades[i] });
-        }
+        const consumo = calculos.distancia * CONSUMO_PROMEDIO;
+        const emisionesTotal = consumo * CO2_POR_LITRO;
 
         resultados.innerHTML = `
             <h2>Resultados</h2>
             <p>Total de emisiones de CO2 para ${tipoVehiculo}: ${emisionesTotal.toFixed(2)} kg</p>
+            <p>Distancia: ${calculos.distancia.toFixed(2)} m</p>
+            <p>Tiempo: ${calculos.tiempo.toFixed(2)} s</p>
+            <p>Velocidad Final: ${velocidadFinal.toFixed(2)} m/s</p>
+            <p>Aceleración: ${aceleracion ? aceleracion.toFixed(2) + ' m/s²' : 'N/A'}</p>
         `;
 
-        velocidadVsTiempo.forEach((punto) => {
-            velocidadChart.data.labels.push(punto.tiempo);
-            velocidadChart.data.datasets[0].data.push(punto.velocidad);
-        });
+        velocidadChart.data.labels.push(calculos.tiempo);
+        velocidadChart.data.datasets[0].data.push(velocidadFinal);
         velocidadChart.update();
 
         emisionesChart.data.labels.push(`Simulación ${emisionesChart.data.labels.length + 1}`);
@@ -164,4 +148,5 @@ document.addEventListener('DOMContentLoaded', function() {
         emisionesChart.update();
     });
 });
+
 
