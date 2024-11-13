@@ -18,8 +18,8 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             options: {
                 scales: {
-                    x: { title: { display: true, text: 'Tiempo (h)' } },
-                    y: { title: { display: true, text: 'Velocidad (km/h)' } }
+                    x: { title: { display: true, text: 'Tiempo (s)' } },
+                    y: { title: { display: true, text: 'Velocidad (m/s)' } }
                 },
                 plugins: {
                     legend: { display: true },
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
         emisionesChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: [], // Aquí podrías añadir 'Simulación 1', 'Simulación 2', etc.
+                labels: [],
                 datasets: [{
                     label: 'Emisiones de CO2 (kg)',
                     data: [],
@@ -58,14 +58,12 @@ document.addEventListener('DOMContentLoaded', function() {
     inicializarGraficoVelocidadTiempo();
     inicializarGraficoEmisiones();
 
-    // Mostrar opciones de movimiento tras seleccionar el tipo de vehículo
     document.getElementById('tipo_vehiculo').addEventListener('change', function() {
         document.getElementById('movimiento_options').style.display = 'block';
         document.getElementById('mru_data').style.display = 'none';
         document.getElementById('mrua_data').style.display = 'none';
     });
 
-    // Mostrar el formulario de datos específico según el tipo de movimiento
     document.getElementById('tipo_movimiento').addEventListener('change', function() {
         const movimiento = document.getElementById('tipo_movimiento').value;
 
@@ -78,26 +76,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Generar campos para cada intervalo en MRUA
     document.getElementById('num_intervals').addEventListener('input', function() {
         const intervalsContainer = document.getElementById('intervals_container');
-        intervalsContainer.innerHTML = ''; // Limpiar contenedor de intervalos
+        intervalsContainer.innerHTML = '';
         const numIntervals = parseInt(this.value);
 
         for (let i = 1; i <= numIntervals; i++) {
             const intervalDiv = document.createElement('div');
             intervalDiv.innerHTML = `
                 <h4>Intervalo ${i}</h4>
-                <label>Velocidad (km/h):</label>
+                <label>Velocidad (m/s):</label>
                 <input type="number" class="velocidad_intervalo" placeholder="Velocidad para intervalo ${i}">
-                <label>Tiempo (horas):</label>
+                <label>Tiempo (s):</label>
                 <input type="number" class="tiempo_intervalo" placeholder="Tiempo para intervalo ${i}">
             `;
             intervalsContainer.appendChild(intervalDiv);
         }
     });
 
-    // Simulación y cálculo de emisiones
     document.getElementById('simular').addEventListener('click', function() {
         const tipoVehiculo = document.getElementById('tipo_vehiculo').value;
         const tipoMovimiento = document.getElementById('tipo_movimiento').value;
@@ -116,8 +112,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            velocidades.push(velocidad);
-            tiempos.push(tiempo);
+            velocidades.push(velocidad / 3.6); // Convertir de km/h a m/s
+            tiempos.push(tiempo * 3600); // Convertir de horas a segundos
         } else if (tipoMovimiento === 'mrua') {
             const numIntervals = parseInt(document.getElementById('num_intervals').value);
             const velocidadInputs = document.getElementsByClassName('velocidad_intervalo');
@@ -132,8 +128,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
 
-                velocidades.push(velocidad);
-                tiempos.push(tiempo);
+                velocidades.push(velocidad / 3.6); // Convertir de km/h a m/s
+                tiempos.push(tiempo * 3600); // Convertir de horas a segundos
             }
         }
 
@@ -157,16 +153,15 @@ document.addEventListener('DOMContentLoaded', function() {
             <p>Total de emisiones de CO2 para ${tipoVehiculo}: ${emisionesTotal.toFixed(2)} kg</p>
         `;
 
-        // Agregar datos de la nueva simulación al gráfico de velocidad vs tiempo
         velocidadVsTiempo.forEach((punto) => {
             velocidadChart.data.labels.push(punto.tiempo);
             velocidadChart.data.datasets[0].data.push(punto.velocidad);
         });
         velocidadChart.update();
 
-        // Agregar nueva barra para la emisión total de esta simulación
         emisionesChart.data.labels.push(`Simulación ${emisionesChart.data.labels.length + 1}`);
         emisionesChart.data.datasets[0].data.push(emisionesTotal);
         emisionesChart.update();
     });
 });
+
