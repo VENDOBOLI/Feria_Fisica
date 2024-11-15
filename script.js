@@ -150,16 +150,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 let distancia = parseFloat(distanciaInputs[i].value) || null;
                 let tiempo = parseFloat(tiempoInputs[i].value) || null;
 
-                if ((velocidadInicial && distancia && tiempo) || (velocidadFinalInput && distancia && tiempo) || (velocidadInicial && tiempo && distancia)) {
-                    const calculos = calcularMRUA(velocidadInicial, velocidadFinalInput, distancia, tiempo);
-                    velocidadFinal = calculos.velocidadFinal;
-                    distanciaTotal += calculos.distancia;
-                    tiempoTotal += calculos.tiempo;
-                    aceleracion = calculos.aceleracion;
-                } else {
-                    alert(`Para MRUA, proporcione al menos dos valores en el intervalo ${i + 1} entre velocidad, distancia y tiempo.`);
+                const valoresDefinidos = [velocidadInicial, velocidadFinalInput, distancia, tiempo].filter(val => val !== null).length;
+
+                if (valoresDefinidos < 2) {
+                    alert(`Para el intervalo ${i + 1} de MRUA, proporcione al menos dos valores entre velocidad inicial, velocidad final, distancia y tiempo.`);
                     return;
                 }
+
+                const calculos = calcularMRUA(velocidadInicial, velocidadFinalInput, distancia, tiempo);
+                velocidadFinal = calculos.velocidadFinal;
+                distanciaTotal += calculos.distancia;
+                tiempoTotal += calculos.tiempo;
+                aceleracion = calculos.aceleracion;
             }
         }
 
@@ -186,5 +188,3 @@ document.addEventListener('DOMContentLoaded', function() {
         emisionesChart.update();
     });
 });
-
-
