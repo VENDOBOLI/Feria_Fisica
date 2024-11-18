@@ -104,12 +104,30 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function calcularMRUA(velocidadInicial, velocidadFinal, distancia, tiempo) {
-        if (!velocidadFinal) velocidadFinal = velocidadInicial + (distancia / tiempo);
-        if (!distancia) distancia = ((velocidadInicial + velocidadFinal) / 2) * tiempo;
-        if (!tiempo) tiempo = (2 * distancia) / (velocidadInicial + velocidadFinal);
-        const aceleracion = (velocidadFinal - velocidadInicial) / tiempo;
-        return { velocidadFinal, distancia, tiempo, aceleracion };
-    }
+    let aceleracion = null;
+
+    // Si tenemos velocidadInicial, velocidadFinal y tiempo, calculamos aceleración
+    if (velocidadInicial !== null && velocidadFinal !== null && tiempo !== null) {
+        aceleracion = (velocidadFinal - velocidadInicial) / tiempo;
+    } 
+    // Si tenemos velocidadInicial, tiempo y distancia, calculamos aceleración y velocidadFinal
+    else if (velocidadInicial !== null && tiempo !== null && distancia !== null) {
+        aceleracion = (2 * (distancia - (velocidadInicial * tiempo))) / (tiempo * tiempo);
+        velocidadFinal = velocidadInicial + (aceleracion * tiempo);
+    } 
+    // Si tenemos velocidadInicial, aceleración y tiempo, calculamos distancia y velocidadFinal
+    else if (velocidadInicial !== null && aceleracion !== null && tiempo !== null) {
+        distancia = (velocidadInicial * tiempo) + (0.5 * aceleracion * tiempo * tiempo);
+        velocidadFinal = velocidadInicial + (aceleracion * tiempo);
+    } 
+    // Si tenemos velocidadInicial, velocidadFinal y distancia, calculamos tiempo y aceleración
+    else if (velocidadInicial !== null && velocidadFinal !== null && distancia !== null) {
+        tiempo = (2 * distancia) / (velocidadInicial + velocidadFinal);
+        aceleracion = (velocidadFinal - velocidadInicial) / tiempo;
+    } 
+
+    return { velocidadFinal, distancia, tiempo, aceleracion };
+}
 
     document.getElementById('simular').addEventListener('click', function() {
         const tipoVehiculo = document.getElementById('tipo_vehiculo').value;
