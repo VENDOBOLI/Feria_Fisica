@@ -106,12 +106,23 @@ document.addEventListener('DOMContentLoaded', function() {
     function calcularMRUA(velocidadInicial, velocidadFinal, distancia, tiempo) {
     let aceleracion = null;
 
+    // Si no se proporciona velocidadFinal, la calculamos usando los otros datos
+    if (velocidadFinal === null) {
+        if (velocidadInicial !== null && distancia !== null && tiempo !== null && tiempo > 0) {
+            // Calculamos velocidadFinal usando la fórmula de distancia
+            velocidadFinal = (2 * distancia / tiempo) - velocidadInicial;
+        } else if (velocidadInicial !== null && aceleracion !== null && tiempo !== null) {
+            // O calculamos usando aceleración y tiempo si están disponibles
+            velocidadFinal = velocidadInicial + (aceleracion * tiempo);
+        }
+    }
+
     // Si tenemos velocidadInicial, velocidadFinal y tiempo, calculamos aceleración
-    if (velocidadInicial !== null && velocidadFinal !== null && tiempo !== null) {
+    if (velocidadInicial !== null && velocidadFinal !== null && tiempo !== null && tiempo > 0) {
         aceleracion = (velocidadFinal - velocidadInicial) / tiempo;
     } 
     // Si tenemos velocidadInicial, tiempo y distancia, calculamos aceleración y velocidadFinal
-    else if (velocidadInicial !== null && tiempo !== null && distancia !== null) {
+    else if (velocidadInicial !== null && tiempo !== null && distancia !== null && tiempo > 0) {
         aceleracion = (2 * (distancia - (velocidadInicial * tiempo))) / (tiempo * tiempo);
         velocidadFinal = velocidadInicial + (aceleracion * tiempo);
     } 
@@ -124,10 +135,11 @@ document.addEventListener('DOMContentLoaded', function() {
     else if (velocidadInicial !== null && velocidadFinal !== null && distancia !== null) {
         tiempo = (2 * distancia) / (velocidadInicial + velocidadFinal);
         aceleracion = (velocidadFinal - velocidadInicial) / tiempo;
-    } 
+    }
 
     return { velocidadFinal, distancia, tiempo, aceleracion };
 }
+
 
     document.getElementById('simular').addEventListener('click', function() {
         const tipoVehiculo = document.getElementById('tipo_vehiculo').value;
